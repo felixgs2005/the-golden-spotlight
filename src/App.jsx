@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header";
+import Footer from "./components/footer";
 import Home from "./pages/home";
 import About from "./pages/about";
 import Category from "./pages/category";
@@ -21,6 +22,7 @@ function App() {
           <Route path="*" element={<h1>Page non trouvée</h1>} />
         </Routes>
       </main>
+      <Footer />
     </Router>
   );
 }
