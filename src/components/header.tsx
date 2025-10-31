@@ -18,19 +18,19 @@ const Header = () => {
             />
           </a>
 
-          <nav className="nav-links">
+          <nav className="header-nav-links">
             <a href="/category">Categories</a>
             <a href="/about">About</a>
           </nav>
 
-          <div className="icons">
-            <a className="icone-desktop" href="https://instagram.com" target="_blank" rel="noreferrer">
+          <div className="header-icons">
+            <a className="header-icone-desktop" href="https://instagram.com" target="_blank" rel="noreferrer">
               <i className="fab fa-instagram"></i>
             </a>
-            <a className="icone-desktop" href="https://facebook.com" target="_blank" rel="noreferrer">
+            <a className="header-icone-desktop" href="https://facebook.com" target="_blank" rel="noreferrer">
               <i className="fab fa-facebook-f"></i>
             </a>
-            <a className="icone-desktop" href="https://twitter.com" target="_blank" rel="noreferrer">
+            <a className="header-icone-desktop" href="https://twitter.com" target="_blank" rel="noreferrer">
               <i className="fab fa-twitter"></i>
             </a>
 

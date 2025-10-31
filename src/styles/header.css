@@ -21,25 +21,25 @@
 }
 
 /* ---------- Liens ---------- */
-.nav-links a {
+.header-nav-links a {
   margin: 0 15px;
   color: #fff0c4;
   text-decoration: none;
   font-size: 20px;
 }
 
-.nav-links a:hover {
+.header-nav-links a:hover {
   font-weight: bold;
 }
 
 /* ---------- Icônes ---------- */
-.icons {
+.header-icons {
   display: flex;
   align-items: center;
   gap: 25px;
 }
 
-.icons i {
+.header-icons i {
   font-size: 20px;
   color: #fff0c4;
 }
@@ -141,11 +141,11 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1000px) {
-  .nav-links {
+  .header-nav-links {
     display: none;
   }
 
-  .icone-desktop {
+  .header-icone-desktop {
     display: none;
   }
 
