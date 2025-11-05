@@ -6,7 +6,7 @@ import downtownAbbey from "../assets/images/series_poster/downtown_abbey.webp";
 function HomePage() {
   // Exemple minimal d’un film
   const movie = {
-    id: 1,
+    id: 820446,
     title: "Downtown Abbey",
     year: 2025,
     posterUrl: downtownAbbey,
