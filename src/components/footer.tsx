@@ -1,4 +1,3 @@
-import React from "react";
 import "../styles/footer.css";
 
 const Footer = () => {
@@ -33,7 +32,7 @@ const Footer = () => {
 
       </div>
 
-      <p className="footer-copy">© 2025 The Golden Spotlight. Jessie - Félix</p>
+      <p className="footer-copy">© 2025 The Golden Spotlight / Jessie - Félix</p>
     </footer>
   );
 };

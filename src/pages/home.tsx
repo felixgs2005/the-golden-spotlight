@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom"; // ← important pour la navigation
 import "../styles/home.css";
 import downtownAbbey from "../assets/images/series_poster/downtown_abbey.webp";

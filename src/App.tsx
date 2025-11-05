@@ -6,12 +6,13 @@ import About from "./pages/about";
 import Category from "./pages/category";
 import FilmDetails from "./pages/filmDetails";
 import ActorProfile from "./pages/actorProfile";
+import "./styles/styles.css";
 
 function App() {
   return (
     <Router>
       <Header />
-      <main style={{ padding: "20px" }}>
+      <div className="body">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -21,7 +22,7 @@ function App() {
           {/* Page 404 simple */}
           <Route path="*" element={<h1>Page non trouvée</h1>} />
         </Routes>
-      </main>
+      </div>
       <Footer />
     </Router>
   );
