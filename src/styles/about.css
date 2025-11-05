@@ -1,0 +1,121 @@
+.about {
+    background-color: #120505;
+    padding: 4rem 2rem;
+    color: #fff;
+    text-align: center;
+    min-height: 100vh;
+}
+
+.about__title {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    font-family: "LTC Broadway Engraved", serif;
+}
+
+.about__team {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+    align-items: center;
+}
+
+.team-member {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.team-member--right {
+    flex-direction: row-reverse;
+}
+
+.team-member__media {
+    position: relative;
+    width: 682px;
+    height: 682px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-member__photo-wrapper {
+    position: relative;
+    width: 682px;
+    height: 682px;
+}
+
+.team-member__photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 486px;
+    height: 486px;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    border-radius: 2px;
+    z-index: 1;
+}
+
+.team-member__frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 682px;
+    height: 682px;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.team-member__content {
+    max-width: 480px;
+    text-align: left;
+}
+
+.team-member--right .team-member__content {
+    text-align: right;
+}
+
+.team-member__name {
+    font-family: "Parisienne", cursive;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.team-member__bio {
+    line-height: 1.6;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+    .team-member {
+        flex-direction: column;
+    }
+
+    .team-member--right {
+        flex-direction: column;
+    }
+
+    .team-member__content {
+        text-align: center !important;
+    }
+
+    .team-member__media {
+        width: 90%;
+        height: auto;
+        max-width: 400px;
+    }
+
+    .team-member__photo-wrapper,
+    .team-member__frame {
+        width: 100%;
+        height: auto;
+    }
+
+    .team-member__photo {
+        width: 70%;
+        height: auto;
+    }
+}
