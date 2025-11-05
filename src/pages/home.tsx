@@ -15,13 +15,12 @@ function HomePage() {
     <div className="home-container">
       <div className="section-hero">
         <img className="img-hero" src={movie.posterUrl} alt={movie.title} />
-        <h2>{movie.title}</h2>
-        <p>{movie.year}</p>
-        {/* Lien vers la page du film */}
-        <Link to={`/film/${movie.id}`} className="btn-link">
-          Voir le film
+        <Link to={`/film/${movie.id}`} className="play-button">
+          <i className="fa fa-play" aria-hidden="true"></i> Play
         </Link>
       </div>
+      <h2>{movie.title}</h2>
+      <p>{movie.year}</p>
     </div>
   );
 }
