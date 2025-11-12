@@ -42,9 +42,10 @@ export default function AboutUs() {
 
   return (
     <main id="main" className="about">
-      {/* <header className="about__header">
-        <h1 className="about__title">About us</h1>
-      </header> */}
+      <div className="about-header">
+        <span className="about-header__corner about-header__corner--tl" aria-hidden="true" />
+        <h1 className="about-header__title">About us</h1>
+      </div>
 
       <section className="about__team" aria-label="Team">
         <TeamMember
@@ -54,7 +55,6 @@ export default function AboutUs() {
           bio={felixBio}
           align="left"
         />
-
         <TeamMember
           name="Jessie Leclerc"
           photoSrc={jessieImg}
