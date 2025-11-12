@@ -1,0 +1,65 @@
+.film-hero {
+    background-size: cover;
+    background-position: center;
+    min-height: 40vh;
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+
+.over-overlay {
+    position: relative;
+    z-index: 2;
+}
+
+.poster img {
+    aspect-ratio: 2/3;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.resultDetailsRight {
+    font-size: 14px;
+}
+
+.play-button {
+  padding: 6px 30px;
+  background-color: #FFF0C4;
+  color: #8C1007;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-transform: uppercase;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  z-index: 10;
+
+  clip-path: polygon(
+    10% 0%,  
+    100% 0%, 
+    100% 100%, 
+    10% 100%, 
+    0% 50%   
+  );
+}
+
+.actor-card {
+    width: 200px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

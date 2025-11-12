@@ -6,13 +6,22 @@ export interface TMDBGenre {
 // Calqué sur /movie/{id}
 export interface MovieTMDB {
   id: number;
-  title: string;               // localisé
-  original_title: string;
-  tagline?: string | null;
-  overview?: string | null;
-  poster_path?: string | null;   // "/abc.jpg"
-  backdrop_path?: string | null; // "/xyz.jpg"
-  release_date?: string | null;  // "YYYY-MM-DD"
-  genres?: TMDBGenre[];          // présent sur /movie/{id}
-  vote_average?: number;         // 0..10
+  title: string;
+  originalTitle?: string;
+  tagline?: string;
+  overview?: string;
+  posterUrl?: string;
+  backdropUrl?: string;
+  releaseDate?: string;
+  year?: number;
+  genres?: { id: number; name: string }[];
+  rating?: number;
+  runtime?: number;
+  status?: string;
+  originalLanguage?: string;
+  cast?: ActorCredit[];
+  director?: string;
+  trailerUrl?: string;
+  similar?: Movie[];
+  ageRating?: string;
 }
