@@ -25,7 +25,7 @@ function isEssentialMissing(m?: MovieTMDB) {
 
 async function fetchMovieWithCredits(id: string, language: string) {
   const { data } = await api.get<MovieTMDB>(`/movie/${id}`, {
-    params: { language, append_to_response: "credits" },
+    params: { language, append_to_response: "credits,release_dates" },
   });
   return data;
 }

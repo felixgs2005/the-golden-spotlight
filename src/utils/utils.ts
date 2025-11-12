@@ -14,15 +14,27 @@ export function buildProfileUrl(
   return path ? `https://image.tmdb.org/t/p/${size}${path}` : undefined;
 }
 
-export function formatDate(iso?: string | null) {
-  if (!iso) return "";
+// ✅ Format date : 20/12/2024
+export function formatDate(iso?: string | null): string {
+  if (!iso) return "—";
   const [y, m, d] = iso.split("-").map(Number);
-  if (!y || !m || !d) return iso ?? "";
-  const date = new Date(Date.UTC(y, m - 1, d));
-  return date.toLocaleDateString("fr-CA", { year: "numeric", month: "long", day: "numeric" });
+  if (!y || !m || !d) return iso ?? "—";
+  const day = String(d).padStart(2, "0");
+  const month = String(m).padStart(2, "0");
+  const year = y.toString();
+  return `${day}/${month}/${year}`;
 }
 
-export function getYear(iso?: string | null) {
+// ✅ Format durée : 2h 25m
+export function formatRuntime(minutes?: number | null): string {
+  if (!minutes || isNaN(minutes)) return "—";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+// Récupération de l’année d’une date ISO
+export function getYear(iso?: string | null): string {
   if (!iso) return "";
   const y = iso.slice(0, 4);
   return /^\d{4}$/.test(y) ? y : "";
