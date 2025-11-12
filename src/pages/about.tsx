@@ -42,9 +42,9 @@ export default function AboutUs() {
 
   return (
     <main id="main" className="about">
-      <header className="about__header">
+      {/* <header className="about__header">
         <h1 className="about__title">About us</h1>
-      </header>
+      </header> */}
 
       <section className="about__team" aria-label="Team">
         <TeamMember
