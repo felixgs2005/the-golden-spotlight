@@ -153,7 +153,7 @@
     text-align: left;
 }
 
-/* tablet + mobile: stack cards, centered header, two corners */
+
 @media (max-width: 900px) {
 
     :root {
@@ -165,7 +165,7 @@
         padding: 3.25rem 1.25rem 3.5rem;
     }
 
-    /* HEADER MOBILE STYLE (now starts at 900px) */
+
     .about-header {
         width: 100%;
         margin: 0 auto 1.5rem;
@@ -209,7 +209,7 @@
         width: 100%;
     }
 
-    /* TEAM LAYOUT */
+
     .about__team {
         row-gap: 3.5rem;
         width: 100%;
