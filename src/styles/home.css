@@ -38,11 +38,13 @@
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-size: 20px;
 
-  clip-path: polygon(
-    10% 0%,  /* coin haut gauche coupé */
-    100% 0%, 
-    100% 100%, 
-    10% 100%, /* coin bas gauche coupé */
-    0% 50%   /* pointe gauche */
-  );
+  clip-path: polygon(10% 0%,
+      /* coin haut gauche coupé */
+      100% 0%,
+      100% 100%,
+      10% 100%,
+      /* coin bas gauche coupé */
+      0% 50%
+      /* pointe gauche */
+    );
 }
