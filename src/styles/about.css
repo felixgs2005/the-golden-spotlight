@@ -47,7 +47,7 @@
     position: relative;
     margin: 0;
     padding: calc(var(--corner-pad) * 3.5) 0 0 calc(var(--corner-pad) * 0.9);
-    font-family: "LTC Broadway Engraved", serif;
+    font-family: "ltc-broadway-engraved", sans-serif;
     font-size: clamp(1.6rem, 1.5vw + 1rem, 2.4rem);
     color: var(--gold);
     line-height: 1;
@@ -70,8 +70,13 @@
     column-gap: var(--col-gap);
 }
 
+.team-member--left {
+    margin-top: 75px;
+}
+
 .team-member--right {
     grid-template-columns: minmax(0, 1fr) auto;
+    margin-bottom: 75px;
 }
 
 .team-member__media {
@@ -148,16 +153,66 @@
     text-align: left;
 }
 
-@media (max-width: 1100px) {
-    :root {
-        --frame-size: 460px;
-        --photo-size: 340px;
-    }
-}
 
 @media (max-width: 900px) {
+
+    :root {
+        --frame-size: min(80vw, 340px);
+        --photo-size: calc(var(--frame-size) * 0.8);
+    }
+
     .about {
-        padding: 4.5rem 1.5rem;
+        padding: 3.25rem 1.25rem 3.5rem;
+    }
+
+
+    .about-header {
+        width: 100%;
+        margin: 0 auto 1.5rem;
+        padding-left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    .about-header__corner {
+        display: none;
+    }
+
+    .about-header::before,
+    .about-header::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 150px;
+        height: 150px;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+
+    .about-header::before {
+        left: 0;
+        background-image: url("../assets/images/Decoration/corner_TL.svg");
+    }
+
+    .about-header::after {
+        right: 0;
+        background-image: url("../assets/images/Decoration/corner_TR.svg");
+    }
+
+    .about-header__title {
+        padding: 1.25rem 0 0;
+        text-align: center;
+        white-space: normal;
+        font-size: 2.3rem;
+        width: 100%;
+    }
+
+
+    .about__team {
+        row-gap: 3.5rem;
+        width: 100%;
     }
 
     .team-member {
@@ -184,12 +239,6 @@
     .team-member__name,
     .team-member__bio {
         text-align: center !important;
-    }
-}
-
-@media (max-width: 600px) {
-    :root {
-        --frame-size: 360px;
-        --photo-size: 270px;
+        line-height: 1.5;
     }
 }

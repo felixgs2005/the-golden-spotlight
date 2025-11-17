@@ -7,6 +7,7 @@ import Category from "./pages/category";
 import FilmDetails from "./pages/filmDetails";
 import ActorProfile from "./pages/actorProfile";
 import "./styles/styles.css";
+<link rel="stylesheet" href="https://use.typekit.net/xeu0lwa.css"></link>;
 
 function App() {
   return (

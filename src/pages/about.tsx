@@ -3,6 +3,7 @@ import "../styles/about.css";
 import felixImg from "../assets/images/About us/felix.jpg";
 import jessieImg from "../assets/images/About us/jessie.jpg";
 import pictureFrame from "../assets/images/Decoration/Picture_Frame.png";
+<link rel="stylesheet" href="https://use.typekit.net/xeu0lwa.css"></link>;
 
 type TeamMemberProps = {
   name: string;
