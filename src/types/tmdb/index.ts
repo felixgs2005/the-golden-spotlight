@@ -1,2 +1,2 @@
-export * from "./MovieTMDB";
 export * from "./CreditsTMDB";
+export * from "./MovieTMDB";

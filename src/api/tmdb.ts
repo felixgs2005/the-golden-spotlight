@@ -1,3 +1,4 @@
+// src/api/tmdb.ts
 import axios from "axios";
 import type { Movie } from "../types/domains";
 import type { MovieTMDB, TMDBCastItem } from "../types/tmdb";
@@ -23,14 +24,18 @@ function isEssentialMissing(m?: MovieTMDB) {
   return missingOverview || missingTagline || missingGenres;
 }
 
+// --- CORRECTION : inclure videos dans le fetch ---
 async function fetchMovieWithCredits(id: string, language: string) {
   const { data } = await api.get<MovieTMDB>(`/movie/${id}`, {
-    params: { language, append_to_response: "credits,release_dates" },
+    params: {
+      language,
+      append_to_response: "credits,release_dates,videos", // <-- videos ajouté
+    },
   });
   return data;
 }
 
-/** Fusionne les données FR et EN pour combler les champs manquants */
+// Fusion FR + EN
 function mergeMovieFRwithEN(fr: MovieTMDB, en: MovieTMDB): MovieTMDB {
   return {
     ...fr,
@@ -48,13 +53,14 @@ function mergeMovieFRwithEN(fr: MovieTMDB, en: MovieTMDB): MovieTMDB {
       cast: mergeCast(fr.credits?.cast ?? [], en.credits?.cast ?? []),
       crew: fr.credits?.crew ?? en.credits?.crew ?? [],
     },
+    videos: fr.videos ?? en.videos ?? { results: [] }, // <-- vidéos fusionnées
   };
 }
 
-/** Complète le cast FR avec les infos EN */
+// Complète le cast FR avec EN
 function mergeCast(frCast: TMDBCastItem[], enCast: TMDBCastItem[]): TMDBCastItem[] {
-  const enById = new Map(enCast.map(c => [c.id, c]));
-  const completed = frCast.map(fr => {
+  const enById = new Map(enCast.map((c) => [c.id, c]));
+  const completed = frCast.map((fr) => {
     const en = enById.get(fr.id);
     return {
       ...fr,
@@ -68,7 +74,7 @@ function mergeCast(frCast: TMDBCastItem[], enCast: TMDBCastItem[]): TMDBCastItem
 }
 
 /**
- * Récupère un film avec son cast, en FR si possible, sinon complète avec EN.
+ * Récupère le film en FR, puis complète avec EN si besoin
  */
 export async function getMovieWithCastFrThenCompleteWithEn(
   id: string,

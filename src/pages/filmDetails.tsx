@@ -86,7 +86,7 @@ export default function FilmDetails() {
           </div>
 
           {/* Infos */}
-          <div className="col-md-8 ms-md-5" text-light>
+          <div className="col-md-8 ms-md-5 text-light">
             <Row>
               {/* Colonne gauche : titre + synopsis */}
               <Col md={8}>
@@ -125,13 +125,34 @@ export default function FilmDetails() {
                 </div>
 
                 <div className="rating mb-2">
-                  <span className="text-warning">{"★".repeat(Math.round(movie.rating / 2))}</span>{" "}
-                  {Math.round(movie.rating * 10)}%
+                  {movie.rating ? (
+                    <>
+                      <span className="text-warning">
+                        {"★".repeat(Math.round(movie.rating / 2))}
+                      </span>{" "}
+                      {Math.round(movie.rating * 10)}%
+                    </>
+                  ) : (
+                    <span className="text-muted">Aucune note</span>
+                  )}
                 </div>
 
                 <p className="mb-3" style={{ maxWidth: "600px" }}>
                   {movie.overview ?? <span className="text-muted">Aucun synopsis disponible.</span>}
                 </p>
+
+                {movie.trailerUrl ? (
+                  <a
+                    href={movie.trailerUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="play-button mt-auto"
+                  >
+                    ▶ Trailer
+                  </a>
+                ) : (
+                  <span className="text-muted mt-auto">Aucune bande annonce disponible</span>
+                )}
               </Col>
 
               {/* Colonne droite : détails */}
@@ -165,17 +186,6 @@ export default function FilmDetails() {
                   <strong className="d-block text-uppercase small">Director</strong>
                   <span className="resultDetailsRight">{movie.director ?? "N/A"}</span>
                 </div>
-
-                {movie.trailerUrl && (
-                  <a
-                    href={movie.trailerUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="play-button mt-auto"
-                  >
-                    ▶ Watch Trailer
-                  </a>
-                )}
               </Col>
             </Row>
           </div>
@@ -188,10 +198,7 @@ export default function FilmDetails() {
           <h2 className="text-light mb-4">Actors</h2>
           <div className="d-flex flex-wrap justify-content-center gap-4 text-center">
             {(movie.cast ?? []).slice(0, 5).map((actor) => (
-              <div
-                key={actor.id}
-                className="actor-card p-3 border"
-              >
+              <div key={actor.id} className="actor-card p-3 border">
                 {actor.profileUrl ? (
                   <img
                     src={actor.profileUrl}
@@ -209,7 +216,8 @@ export default function FilmDetails() {
                     }}
                   />
                 )}
-                <p className="text-light mb-0">{actor.name}</p>
+                <p className="name-actor text-light mb-0">{actor.name}</p>
+                <div className="actor-known-for">Known For →</div>
               </div>
             ))}
           </div>
