@@ -5,7 +5,7 @@
     --col-gap: 5rem;
     --row-gap: 5rem;
     --gold: #FFF0C4;
-    --corner-size: clamp(90px, 9vw, 150px);
+    --corner-size: 150px;
     --corner-pad: clamp(0.75rem, 1vw, 1.5rem);
 }
 
@@ -170,8 +170,8 @@
 
     .about-header__corner {
         display: block;
-        width: clamp(90px, 9vw, 150px);
-        height: clamp(90px, 9vw, 150px);
+        width: 150px;
+        height: 150px;
     }
 }
 
