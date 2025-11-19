@@ -2,9 +2,10 @@
 .header {
   background-color: #3E0703;
   color: #fff0c4;
-  padding: 15px 0;
+  padding: 10px 0;
   position: relative;
   z-index: 10;
+  border-bottom: 1px solid #fff0c4;
 }
 
 .header-container {
@@ -16,8 +17,31 @@
   justify-content: space-between;
 }
 
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.logo a {
+  text-decoration: none;
+}
+
 .logo img {
-  height: 50px;
+  height: 55px;
+  display: block;
+} 
+
+.logo-slogan {
+  margin-top: 2px;
+  margin-bottom: 0;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.7px;
+  font-family: 'Parisienne', cursive;
+  font-weight: 300;
+  color: #ffffff;
+  transform: translateY(3px);  
 }
 
 /* ---------- Liens ---------- */
@@ -68,9 +92,11 @@
 .burger.open span:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
+
 .burger.open span:nth-child(2) {
   opacity: 0;
 }
+
 .burger.open span:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
 }
@@ -81,17 +107,33 @@
   top: 0;
   right: -50%;
   width: 50%;
-  height: 50vh;
+  height: 75vh;
   background-color: #3E0703;
   color: #fff0c4;
+
+  border-bottom: 1px solid #fff0c4;
+  border-left: 1px solid #fff0c4;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: flex-start;
   text-align: left;
-  gap: 40px;
+
+  padding: 150px 3rem 150px;
+  gap: 30px;
+
   transition: right 0.4s ease;
   z-index: 20;
+
+  /* Art Deco decorations */
+  background-image:
+    url("../assets/images/Decoration/corner_TL.svg"),
+    url("../assets/images/Decoration/corner_BR.svg");
+  background-repeat: no-repeat;
+  background-position:
+    top 15px left 15px,
+    bottom 15px right 15px;
+  background-size: 120px 120px;
 }
 
 .mobile-menu.show {
@@ -101,26 +143,29 @@
 .mobile-menu a {
   color: #fff0c4;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .mobile-texte-a {
-  margin-left: 40px;
+  margin-left: 0;
 }
 
 .mobile-icons {
   display: flex;
   gap: 40px;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
+  margin-top: 40px;
+  align-self: center;
+}
+
+.mobile-icons i {
+  font-size: 22px;
 }
 
 /* ---------- Bouton X ---------- */
 .close-btn {
   position: absolute;
-  top: 15px;
-  right: 20px;
+  top: 0px;
+  right: 24px;
   font-size: 40px;
   background: none;
   border: none;
@@ -151,5 +196,44 @@
 
   .burger {
     display: flex;
+  }
+}
+
+/* ---------- Tablet adjustments (for menu layout) ---------- */
+
+@media (min-width: 1000px) {
+
+  .mobile-menu,
+  .overlay {
+    display: none !important;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1000px) {
+  .mobile-menu {
+    width: 40%;
+    padding: 150px 60px 60px;
+    gap: 30px;
+    background-size: 140px 140px;
+  }
+
+  .mobile-menu a {
+    font-size: 22px;
+  }
+
+  .mobile-icons {
+    gap: 48px;
+    margin-top: 40px;
+    align-self: flex-start;
+  }
+
+  .mobile-icons i {
+    font-size: 26px;
+  }
+
+  .close-btn {
+    top: 0px;
+    right: 20px;
+    font-size: 48px;
   }
 }

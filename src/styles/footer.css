@@ -69,6 +69,8 @@
   justify-content: center;
   gap: 15px;
   text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
   padding: 40px;
   border-left: 1px solid #FFF0C4;
   border-right: 1px solid #FFF0C4;
@@ -142,6 +144,8 @@
 .footer-socials a {
   color: #FFF0C4;
   font-size: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
   transition: opacity 0.3s ease;
 }
 
