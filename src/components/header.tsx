@@ -11,12 +11,12 @@ const Header = () => {
     <>
       <header className="header">
         <div className="header-container">
-          <a href="/" className="logo">
-            <img
-              src="/images/logo-standard-vieux.png"
-              alt="The Golden Spotlight"
-            />
-          </a>
+          <div className="logo">
+            <a href="/">
+              <img src="/images/logo-standard-vieux.png" alt="The Golden Spotlight" />
+            </a>
+            <p className="logo-slogan">Lights. Glamour. Timeless.</p>
+          </div>
 
           <nav className="header-nav-links">
             <a href="/category">Categories</a>
@@ -24,13 +24,28 @@ const Header = () => {
           </nav>
 
           <div className="header-icons">
-            <a className="header-icone-desktop" href="https://instagram.com" target="_blank" rel="noreferrer">
+            <a
+              className="header-icone-desktop"
+              href="https://instagram.com"
+              target="_blank"
+              rel="noreferrer"
+            >
               <i className="fab fa-instagram"></i>
             </a>
-            <a className="header-icone-desktop" href="https://facebook.com" target="_blank" rel="noreferrer">
+            <a
+              className="header-icone-desktop"
+              href="https://facebook.com"
+              target="_blank"
+              rel="noreferrer"
+            >
               <i className="fab fa-facebook-f"></i>
             </a>
-            <a className="header-icone-desktop" href="https://twitter.com" target="_blank" rel="noreferrer">
+            <a
+              className="header-icone-desktop"
+              href="https://twitter.com"
+              target="_blank"
+              rel="noreferrer"
+            >
               <i className="fab fa-twitter"></i>
             </a>
 
