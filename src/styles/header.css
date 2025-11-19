@@ -28,19 +28,20 @@
 }
 
 .logo img {
-  height: 50px;
+  height: 55px;
   display: block;
-}
+} 
 
 .logo-slogan {
   margin-top: 2px;
   margin-bottom: 0;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 300;
   letter-spacing: 0.7px;
   font-family: 'Parisienne', cursive;
   font-weight: 300;
   color: #ffffff;
-  transform: translateY(3px);
+  transform: translateY(3px);  
 }
 
 /* ---------- Liens ---------- */
