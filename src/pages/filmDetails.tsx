@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import "../styles/filmDetail.css";
 import { Alert, Container, Row, Col, Card, Placeholder } from "react-bootstrap";
-import { getMovieWithCastFrThenCompleteWithEn } from "../api/tmdb.ts";
-import { formatDate, formatRuntime } from "../utils/utils";
+import { getMovieWithDetails } from "../api/tmdb";
+import {
+  getMovieTitle,
+  getMoviePosterUrl,
+  getMovieBackdropUrl,
+  getFormattedReleaseDate,
+  getFormattedRuntime,
+  getMovieGenresText,
+  getMovieRating,
+  getMovieCastNames,
+  getMovieDirector,
+  getMovieStatus,
+  getMovieOriginalLanguage,
+  getMovieAgeRating,
+  getTrailerUrl,
+  getTopCast,
+  getSimilarMovies,
+} from "../api/mapper";
 import type { Movie } from "../types/domains";
+import "../styles/filmDetail.css";
 
 type State =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; error: string }
-  | {
-      status: "success";
-      movie: Movie;
-      languageUsed: string;
-      usedFallback: boolean;
-      completed: {
-        overview?: boolean;
-        tagline?: boolean;
-        genres?: boolean;
-        cast?: boolean;
-      };
-    };
+  | { status: "success"; movie: Movie };
 
 export default function FilmDetails() {
   const { id } = useParams<{ id: string }>();
@@ -29,244 +34,565 @@ export default function FilmDetails() {
 
   useEffect(() => {
     if (!id) return;
+
     let mounted = true;
     setState({ status: "loading" });
-    getMovieWithCastFrThenCompleteWithEn(id, "fr-CA")
-      .then((res) => mounted && setState({ status: "success", ...res }))
+
+    getMovieWithDetails(id)
+      .then((movie) => mounted && setState({ status: "success", movie }))
       .catch((e) => mounted && setState({ status: "error", error: String(e) }));
+
     return () => {
       mounted = false;
     };
   }, [id]);
 
   if (state.status !== "success") {
-    if (state.status === "error")
+    if (state.status === "error") {
       return (
         <Alert variant="danger" className="mt-3">
-          Erreur: {state.error}
+          Error: {state.error}
         </Alert>
       );
+    }
     return <Skeleton />;
   }
 
-  const { movie, languageUsed, usedFallback, completed } = state;
-
-  // Safe vote calculation (movie.rating peut être undefined)
-  const vote =
-    typeof movie.rating === "number" ? Math.round((movie.rating ?? 0) * 10) / 10 : undefined;
-
-  // helper pour afficher des étoiles (0-5) à partir d'une note sur 10
-  const renderStars = (rating?: number) => {
-    if (typeof rating !== "number") return "—";
-    const stars = Math.round((rating / 10) * 5); // convert 0-10 -> 0-5
-    return "★".repeat(stars) + "☆".repeat(5 - stars);
-  };
+  const { movie } = state;
+  const rating = getMovieRating(movie);
+  const topCast = getTopCast(movie, 5);
+  const similarMovies = getSimilarMovies(movie, 6);
 
   return (
     <div className="film-details-page">
-      {/* Section principale avec fond (protection si pas de backdrop) */}
-      <section
-        className="film-hero"
-        style={{
-          backgroundImage: movie.backdropUrl ? `url(${movie.backdropUrl})` : undefined,
-        }}
-      >
-        <div className="overlay" />
-
-        <div className="container over-overlay py-5 d-flex flex-wrap align-items-start">
-          {/* Affiche */}
-          <div className="poster col-md-3 mb-4">
-            {movie.posterUrl ? (
-              <img src={movie.posterUrl} alt={movie.title} />
-            ) : (
-              <div>
-                <span className="text-muted">Aucune affiche</span>
-              </div>
-            )}
-          </div>
-
-          {/* Infos */}
-          <div className="col-md-8 ms-md-5 text-light">
-            <Row>
-              {/* Colonne gauche : titre + synopsis */}
-              <Col md={8}>
-                <h1 className="fw-bold">{movie.title}</h1>
-
-                <div className="d-flex align-items-center flex-wrap gap-2 mb-3 text-light">
-                  {/* Badge âge / maturité */}
-                  {movie.ageRating && (
-                    <span
-                      className="badge-age fw-bold"
-                      style={{
-                        backgroundColor: "#f5d7b7",
-                        color: "#150804",
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {movie.ageRating}
-                    </span>
-                  )}
-
-                  {/* Date de sortie */}
-                  <span>{formatDate(movie.releaseDate)}</span>
-
-                  {/* Durée */}
-                  <span>— {formatRuntime(movie.runtime)}</span>
-
-                  {/* Genres */}
-                  <span>
-                    —{" "}
-                    {(movie.genres ?? []).length > 0
-                      ? movie.genres.map((g) => g.name).join(", ")
-                      : "—"}
-                  </span>
-                </div>
-
-                <div className="rating mb-2">
-                  {movie.rating ? (
-                    <>
-                      <span className="text-warning">
-                        {"★".repeat(Math.round(movie.rating / 2))}
-                      </span>{" "}
-                      {Math.round(movie.rating * 10)}%
-                    </>
-                  ) : (
-                    <span className="text-muted">Aucune note</span>
-                  )}
-                </div>
-
-                <p className="mb-3" style={{ maxWidth: "600px" }}>
-                  {movie.overview ?? <span className="text-muted">Aucun synopsis disponible.</span>}
-                </p>
-
-                {movie.trailerUrl ? (
-                  <a
-                    href={movie.trailerUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="play-button mt-auto"
-                  >
-                    ▶ Trailer
-                  </a>
-                ) : (
-                  <span className="text-muted mt-auto">Aucune bande annonce disponible</span>
-                )}
-              </Col>
-
-              {/* Colonne droite : détails */}
-              <Col
-                md={4}
-                className="text-md-end text-light mt-4 mt-md-0 d-flex flex-column align-items-md-end align-items-start position-relative"
-              >
-                <div className="detail-item mb-3">
-                  <strong className="d-block text-uppercase small">Status</strong>
-                  <span className="resultDetailsRight">{movie.status ?? "—"}</span>
-                </div>
-
-                <div className="detail-item mb-3">
-                  <strong className="d-block text-uppercase small">Original Language</strong>
-                  <span className="resultDetailsRight">
-                    {(movie.originalLanguage ?? "—").toUpperCase()}
-                  </span>
-                </div>
-
-                <div className="detail-item mb-3">
-                  <strong className="d-block text-uppercase small">Starring</strong>
-                  <span className="resultDetailsRight">
-                    {(movie.cast ?? [])
-                      .slice(0, 3)
-                      .map((c) => c.name)
-                      .join(", ") || "—"}
-                  </span>
-                </div>
-
-                <div className="detail-item mb-3">
-                  <strong className="d-block text-uppercase small">Director</strong>
-                  <span className="resultDetailsRight">{movie.director ?? "N/A"}</span>
-                </div>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </section>
-
-      {/* Section Acteurs */}
-      <section className="actors-section py-5">
-        <div className="container">
-          <h2 className="text-light mb-4">Actors</h2>
-          <div className="d-flex flex-wrap justify-content-center gap-4 text-center">
-            {(movie.cast ?? []).slice(0, 5).map((actor) => (
-              <div key={actor.id} className="actor-card p-3 border">
-                {actor.profileUrl ? (
-                  <img
-                    src={actor.profileUrl}
-                    alt={actor.name}
-                    className="img-fluid rounded-circle mb-2"
-                    style={{ width: 100, height: 100, objectFit: "cover" }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: "50%",
-                      background: "#333",
-                    }}
-                  />
-                )}
-                <p className="name-actor text-light mb-0">{actor.name}</p>
-                <div className="actor-known-for">Known For →</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section Similar Titles */}
-      <section className="similar-section py-5" style={{ background: "#150804", color: "#f5d7b7" }}>
-        <div className="container">
-          <h2 className="mb-4">Similar titles</h2>
-          <div className="d-flex gap-3 overflow-auto pb-3">
-            {(movie.similar ?? []).slice(0, 6).map((sim) => (
-              <Link
-                key={sim.id}
-                to={`/film/${sim.id}`}
-                className="text-decoration-none text-light"
-                style={{ display: "inline-block" }}
-              >
-                {sim.posterUrl ? (
-                  <img
-                    src={sim.posterUrl}
-                    alt={sim.title}
-                    style={{
-                      width: 140,
-                      borderRadius: 6,
-                      transition: "transform 0.2s",
-                    }}
-                    className="shadow-sm"
-                    onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                    onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 140,
-                      height: 210,
-                      borderRadius: 6,
-                      background: "#333",
-                    }}
-                  />
-                )}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HeroSection movie={movie} rating={rating} />
+      <ActorsSection actors={topCast} />
+      <SimilarSection movies={similarMovies} />
     </div>
   );
 }
+
+// ==================== HERO SECTION ====================
+
+function HeroSection({
+  movie,
+  rating,
+}: {
+  movie: Movie;
+  rating: ReturnType<typeof getMovieRating>;
+}) {
+  const backdropUrl = getMovieBackdropUrl(movie);
+  const posterUrl = getMoviePosterUrl(movie);
+  const ageRating = getMovieAgeRating(movie);
+  const trailerUrl = getTrailerUrl(movie);
+
+  return (
+    <section
+      className="film-hero"
+      style={{
+        backgroundImage: backdropUrl ? `url(${backdropUrl})` : undefined,
+      }}
+    >
+      <div className="overlay" />
+
+      <div className="container over-overlay py-5 d-flex flex-wrap align-items-start">
+        <PosterColumn posterUrl={posterUrl} title={getMovieTitle(movie)} />
+
+        <div className="col-md-8 ms-md-5 text-light">
+          <Row>
+            <Col md={8}>
+              <MovieInfo
+                movie={movie}
+                rating={rating}
+                ageRating={ageRating}
+                trailerUrl={trailerUrl}
+              />
+            </Col>
+
+            <Col
+              md={4}
+              className="text-md-end text-light mt-4 mt-md-0 d-flex flex-column align-items-md-end align-items-start"
+            >
+              <MovieDetails movie={movie} />
+            </Col>
+          </Row>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ==================== POSTER COLUMN ====================
+
+function PosterColumn({ posterUrl, title }: { posterUrl?: string; title: string }) {
+  return (
+    <div className="poster col-md-3 mb-4">
+      {posterUrl ? (
+        <img src={posterUrl} alt={title} />
+      ) : (
+        <div>
+          <span className="text-muted">No poster available</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== MOVIE INFO ====================
+
+function MovieInfo({
+  movie,
+  rating,
+  ageRating,
+  trailerUrl,
+}: {
+  movie: Movie;
+  rating: ReturnType<typeof getMovieRating>;
+  ageRating?: string;
+  trailerUrl?: string;
+}) {
+  return (
+    <>
+      <h1 className="fw-bold">{getMovieTitle(movie)}</h1>
+
+      <div className="d-flex align-items-center flex-wrap gap-2 mb-3 text-light">
+        {ageRating && (
+          <span
+            className="badge-age fw-bold"
+            style={{
+              backgroundColor: "#f5d7b7",
+              color: "#150804",
+              padding: "0.25rem 0.5rem",
+              borderRadius: "4px",
+              fontSize: "0.8rem",
+            }}
+          >
+            {ageRating}
+          </span>
+        )}
+
+        <span>{getFormattedReleaseDate(movie)}</span>
+        <span>— {getFormattedRuntime(movie)}</span>
+        <span>— {getMovieGenresText(movie)}</span>
+      </div>
+
+      <RatingDisplay rating={rating} />
+
+      <p className="mb-3" style={{ maxWidth: "600px" }}>
+        {movie.overview ?? <span className="text-muted">No synopsis available.</span>}
+      </p>
+
+      <TrailerButton trailerUrl={trailerUrl} />
+    </>
+  );
+}
+
+// ==================== RATING DISPLAY ====================
+
+function RatingDisplay({ rating }: { rating: ReturnType<typeof getMovieRating> }) {
+  if (!rating) {
+    return (
+      <div className="rating mb-2">
+        <span className="text-muted">No rating available</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rating mb-2">
+      <span className="text-warning">{rating.stars}</span> {rating.percentage}
+    </div>
+  );
+}
+
+// ==================== TRAILER BUTTON ====================
+
+function TrailerButton({ trailerUrl }: { trailerUrl?: string }) {
+  if (!trailerUrl) {
+    return <span className="text-muted mt-auto">No trailer available</span>;
+  }
+
+  return (
+    <a href={trailerUrl} target="_blank" rel="noreferrer" className="play-button mt-auto">
+      <i className="fa fa-play" aria-hidden="true"></i> Trailer
+    </a>
+  );
+}
+
+// ==================== MOVIE DETAILS ====================
+
+function MovieDetails({ movie }: { movie: Movie }) {
+  return (
+    <>
+      <DetailItem label="Status" value={getMovieStatus(movie)} />
+      <DetailItem label="Original Language" value={getMovieOriginalLanguage(movie)} />
+      <DetailItem label="Starring" value={getMovieCastNames(movie, 3)} />
+      <DetailItem label="Director" value={getMovieDirector(movie)} />
+    </>
+  );
+}
+
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="detail-item mb-3">
+      <strong className="d-block text-uppercase small">{label}</strong>
+      <span className="resultDetailsRight">{value}</span>
+    </div>
+  );
+}
+
+// ==================== ACTORS SECTION ====================
+
+function ActorsSection({ actors }: { actors: any[] }) {
+  if (actors.length === 0) return null;
+
+  return (
+    <section className="actors-section py-5">
+      <div className="container">
+        <h2 className="text-light mb-4">Actors</h2>
+        <div className="d-flex flex-wrap justify-content-center gap-4 text-center">
+          {actors.map((actor) => (
+            <ActorCard key={actor.id} actor={actor} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ActorCard({ actor }: { actor: any }) {
+  return (
+    <div className="actor-card p-3 border">
+      {actor.profileUrl ? (
+        <img
+          src={actor.profileUrl}
+          alt={actor.name}
+          className="img-fluid rounded-circle mb-2"
+          style={{ width: 100, height: 100, objectFit: "cover" }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: "50%",
+            background: "#333",
+          }}
+        />
+      )}
+      <p className="name-actor text-light mb-0">{actor.name}</p>
+      <div className="actor-known-for">Known For →</div>
+    </div>
+  );
+}
+
+// ==================== SIMILAR SECTION ====================
+
+function SimilarSection({ movies }: { movies: Movie[] }) {
+  const [positions, setPositions] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (movies.length === 0) return;
+    const center = Math.floor(movies.length / 2);
+    const initial = movies.map((_, i) => {
+      if (i === center - 2) return 1;
+      if (i === center - 1) return 2;
+      if (i === center) return 3;
+      if (i === center + 1) return 4;
+      if (i === center + 2) return 5;
+      return 0;
+    });
+    setPositions(initial);
+  }, [movies]);
+
+  if (movies.length === 0) return null;
+
+  const handlePrev = () => {
+    setPositions((prev) => {
+      const newPositions = [...prev];
+      newPositions.forEach((_, i) => {
+        if (newPositions[i] === 1) newPositions[i] = 2;
+        else if (newPositions[i] === 2) newPositions[i] = 3;
+        else if (newPositions[i] === 3) newPositions[i] = 4;
+        else if (newPositions[i] === 4) newPositions[i] = 5;
+        else if (newPositions[i] === 5) newPositions[i] = 0;
+        else if (newPositions[i] === 0) {
+          const prevIndex = (i - 1 + movies.length) % movies.length;
+          if (newPositions[prevIndex] === 1) newPositions[i] = 1;
+        }
+      });
+      const firstZero = newPositions.findIndex((p) => p === 0);
+      if (firstZero !== -1) newPositions[firstZero] = 1;
+      return newPositions;
+    });
+  };
+
+  const handleNext = () => {
+    setPositions((prev) => {
+      const newPositions = [...prev];
+      newPositions.forEach((_, i) => {
+        if (newPositions[i] === 5) newPositions[i] = 4;
+        else if (newPositions[i] === 4) newPositions[i] = 3;
+        else if (newPositions[i] === 3) newPositions[i] = 2;
+        else if (newPositions[i] === 2) newPositions[i] = 1;
+        else if (newPositions[i] === 1) newPositions[i] = 0;
+        else if (newPositions[i] === 0) {
+          const nextIndex = (i + 1) % movies.length;
+          if (newPositions[nextIndex] === 5) newPositions[i] = 5;
+        }
+      });
+      const lastFive = newPositions.lastIndexOf(5);
+      const nextIdx = (lastFive + 1) % movies.length;
+      if (newPositions[nextIdx] === 0) newPositions[nextIdx] = 5;
+      return newPositions;
+    });
+  };
+
+  return (
+    <section className="similar-section py-5" style={{ background: "#150804", color: "#f5d7b7" }}>
+      <div className="container">
+        <h2 className="mb-4">Similar titles</h2>
+
+        <div
+          style={{
+            height: "35rem",
+            width: "100%",
+            maxWidth: "1200px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+            margin: "2rem auto",
+          }}
+        >
+          {/* Left Arrow */}
+          <div
+            onClick={handlePrev}
+            style={{
+              height: "100%",
+              width: "10%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              zIndex: 10,
+            }}
+          >
+            <i className="fa fa-angle-left" style={{ fontSize: "24px", color: "#f5d7b7" }}></i>
+          </div>
+
+          {/* Slider Content */}
+          <div
+            style={{
+              height: "100%",
+              width: "80%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
+              perspective: "100px",
+              overflow: "hidden",
+            }}
+          >
+            {movies.map((movie, index) => (
+              <SimilarMovieCard key={movie.id} movie={movie} position={positions[index]} />
+            ))}
+
+            {/* Gradient Overlay */}
+            <div
+              style={{
+                height: "100%",
+                width: "102%",
+                position: "absolute",
+                top: 0,
+                left: "-1%",
+                background:
+                  "linear-gradient(to left, #150804, transparent, transparent, transparent, #150804)",
+                zIndex: 3,
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+
+          {/* Right Arrow */}
+          <div
+            onClick={handleNext}
+            style={{
+              height: "100%",
+              width: "10%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              zIndex: 10,
+            }}
+          >
+            <i className="fa fa-angle-right" style={{ fontSize: "24px", color: "#f5d7b7" }}></i>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SimilarMovieCard({ movie, position }: { movie: Movie; position: number }) {
+  const posterUrl = getMoviePosterUrl(movie);
+
+  const getPositionStyles = () => {
+    const baseStyle = {
+      position: "absolute" as const,
+      left: "50%",
+      height: "24rem",
+      maxHeight: "400px",
+      width: "14rem",
+      minWidth: "270px",
+      borderRadius: "25px",
+      zIndex: 0,
+      opacity: 0,
+      transform: "translate(-50%, 0) rotateY(0deg) scale(1,1)",
+      transformStyle: "preserve-3d" as const,
+      transition:
+        "transform 0.5s ease-in-out, opacity 0.5s ease-in-out, left 0.5s ease-in-out, z-index 0s 0.25s ease-in-out, box-shadow 0.5s ease-in-out, filter 0.5s ease-in-out",
+      overflow: "hidden",
+    };
+
+    switch (position) {
+      case 1:
+        return {
+          ...baseStyle,
+          left: "20%",
+          zIndex: 1,
+          transform: "translate(-50%, 0) rotateY(-2deg) scale(0.8, 0.8)",
+          opacity: 1,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1)",
+          filter: "blur(5px)",
+        };
+      case 2:
+        return {
+          ...baseStyle,
+          left: "35%",
+          zIndex: 2,
+          transform: "translate(-50%, 0) rotateY(-1deg) scale(0.9, 0.9)",
+          opacity: 1,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3)",
+          filter: "blur(2px)",
+        };
+      case 3:
+        return {
+          ...baseStyle,
+          left: "50%",
+          zIndex: 4,
+          transform: "translate(-50%, 0) rotateY(0deg) scale(1, 1)",
+          opacity: 1,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5)",
+          filter: "blur(0px)",
+          cursor: "pointer",
+        };
+      case 4:
+        return {
+          ...baseStyle,
+          left: "65%",
+          zIndex: 2,
+          transform: "translate(-50%, 0) rotateY(1deg) scale(0.9, 0.9)",
+          opacity: 1,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3)",
+          filter: "blur(2px)",
+        };
+      case 5:
+        return {
+          ...baseStyle,
+          left: "80%",
+          zIndex: 1,
+          transform: "translate(-50%, 0) rotateY(2deg) scale(0.8, 0.8)",
+          opacity: 1,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1)",
+          filter: "blur(5px)",
+        };
+      default:
+        return {
+          ...baseStyle,
+          left: "50%",
+          zIndex: 0,
+          transform: "translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7)",
+          opacity: 0,
+          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0)",
+        };
+    }
+  };
+
+  const isCenter = position === 3;
+
+  return (
+    <Link
+      to={`/film/${movie.id}`}
+      className="text-decoration-none"
+      style={{
+        ...getPositionStyles(),
+        pointerEvents: isCenter ? "auto" : "none",
+      }}
+      onMouseEnter={(e) => {
+        if (isCenter) {
+          e.currentTarget.style.boxShadow = "0px 0rem 1.8rem rgba(0, 0, 0, 0.7)";
+          e.currentTarget.style.transform = "translate(-50%, 0) rotateY(0deg) scale(1.05, 1.05)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (isCenter) {
+          e.currentTarget.style.boxShadow = "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5)";
+          e.currentTarget.style.transform = "translate(-50%, 0) rotateY(0deg) scale(1, 1)";
+        }
+      }}
+    >
+      {posterUrl ? (
+        <img
+          src={posterUrl}
+          alt={getMovieTitle(movie)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            borderRadius: "25px",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            background: "#333",
+            borderRadius: "25px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ color: "#666" }}>No poster</span>
+        </div>
+      )}
+
+      {isCenter && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "4%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "90%",
+            textAlign: "center",
+            color: "#f5d7b7",
+            fontWeight: "600",
+            fontSize: "16px",
+            textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+          }}
+        >
+          {getMovieTitle(movie)}
+        </div>
+      )}
+    </Link>
+  );
+}
+
+// ==================== SKELETON ====================
 
 function Skeleton() {
   return (
