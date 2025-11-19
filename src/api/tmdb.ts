@@ -32,6 +32,14 @@ async function fetchMovieWithCredits(id: string, language: string) {
       append_to_response: "credits,release_dates,videos", // <-- videos ajouté
     },
   });
+  console.log("🔥 DEBUG fetchMovieWithCredits() | data :", {
+    id: data.id,
+    title: data.title,
+    hasVideos: data.videos ? true : false,
+    videos: data.videos,
+    credits: data.credits,
+    release_dates: data.release_dates,
+  });
   return data;
 }
 
@@ -39,8 +47,8 @@ async function fetchMovieWithCredits(id: string, language: string) {
 function mergeMovieFRwithEN(fr: MovieTMDB, en: MovieTMDB): MovieTMDB {
   return {
     ...fr,
-    title: fr.title || en.title,
-    original_title: fr.original_title || en.original_title,
+    title: en.title || en.title,
+    original_title: en.original_title || en.original_title,
     tagline: fr.tagline || en.tagline,
     overview: fr.overview || en.overview,
     poster_path: fr.poster_path ?? en.poster_path,
@@ -53,7 +61,7 @@ function mergeMovieFRwithEN(fr: MovieTMDB, en: MovieTMDB): MovieTMDB {
       cast: mergeCast(fr.credits?.cast ?? [], en.credits?.cast ?? []),
       crew: fr.credits?.crew ?? en.credits?.crew ?? [],
     },
-    videos: fr.videos ?? en.videos ?? { results: [] }, // <-- vidéos fusionnées
+    videos: en.videos ?? fr.videos ?? { results: [] }, // <-- vidéos fusionnées
   };
 }
 
@@ -87,14 +95,6 @@ export async function getMovieWithCastFrThenCompleteWithEn(
 }> {
   const fr = await fetchMovieWithCredits(id, preferredFr);
 
-  if (!isEssentialMissing(fr)) {
-    return {
-      movie: mapMovie(fr),
-      languageUsed: preferredFr,
-      usedFallback: false,
-      completed: {},
-    };
-  }
 
   const en = await fetchMovieWithCredits(id, "en-US");
   const merged = mergeMovieFRwithEN(fr, en);
