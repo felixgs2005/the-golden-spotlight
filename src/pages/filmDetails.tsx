@@ -31,6 +31,7 @@ type State =
 export default function FilmDetails() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<State>({ status: "idle" });
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -62,12 +63,18 @@ export default function FilmDetails() {
   const rating = getMovieRating(movie);
   const topCast = getTopCast(movie, 5);
   const similarMovies = getSimilarMovies(movie, 6);
+  const trailerUrl = getTrailerUrl(movie);
 
   return (
     <div className="film-details-page">
-      <HeroSection movie={movie} rating={rating} />
+      <HeroSection movie={movie} rating={rating} onPlayTrailer={() => setShowTrailer(true)} />
       <ActorsSection actors={topCast} />
       <SimilarSection movies={similarMovies} />
+
+      {/* Trailer Modal */}
+      {showTrailer && trailerUrl && (
+        <TrailerModal trailerUrl={trailerUrl} onClose={() => setShowTrailer(false)} />
+      )}
     </div>
   );
 }
@@ -77,9 +84,11 @@ export default function FilmDetails() {
 function HeroSection({
   movie,
   rating,
+  onPlayTrailer,
 }: {
   movie: Movie;
   rating: ReturnType<typeof getMovieRating>;
+  onPlayTrailer: () => void;
 }) {
   const backdropUrl = getMovieBackdropUrl(movie);
   const posterUrl = getMoviePosterUrl(movie);
@@ -93,7 +102,7 @@ function HeroSection({
         backgroundImage: backdropUrl ? `url(${backdropUrl})` : undefined,
       }}
     >
-      <div className="overlay" />
+      <div className="overlay-hero-filmDetails" />
 
       <div className="container over-overlay py-5 d-flex flex-wrap align-items-start">
         <PosterColumn posterUrl={posterUrl} title={getMovieTitle(movie)} />
@@ -101,19 +110,14 @@ function HeroSection({
         <div className="col-md-8 ms-md-5 text-light">
           <Row>
             <Col md={8}>
-              <MovieInfo
-                movie={movie}
-                rating={rating}
-                ageRating={ageRating}
-                trailerUrl={trailerUrl}
-              />
+              <MovieInfo movie={movie} rating={rating} ageRating={ageRating} />
             </Col>
 
             <Col
               md={4}
               className="text-md-end text-light mt-4 mt-md-0 d-flex flex-column align-items-md-end align-items-start"
             >
-              <MovieDetails movie={movie} />
+              <MovieDetails movie={movie} trailerUrl={trailerUrl} onPlayTrailer={onPlayTrailer} />
             </Col>
           </Row>
         </div>
@@ -144,12 +148,10 @@ function MovieInfo({
   movie,
   rating,
   ageRating,
-  trailerUrl,
 }: {
   movie: Movie;
   rating: ReturnType<typeof getMovieRating>;
   ageRating?: string;
-  trailerUrl?: string;
 }) {
   return (
     <>
@@ -181,8 +183,6 @@ function MovieInfo({
       <p className="mb-3" style={{ maxWidth: "600px" }}>
         {movie.overview ?? <span className="text-muted">No synopsis available.</span>}
       </p>
-
-      <TrailerButton trailerUrl={trailerUrl} />
     </>
   );
 }
@@ -214,20 +214,33 @@ function TrailerButton({ trailerUrl }: { trailerUrl?: string }) {
 
   return (
     <a href={trailerUrl} target="_blank" rel="noreferrer" className="play-button mt-auto">
-      <i className="fa fa-play" aria-hidden="true"></i> Trailer
+      ▶ Trailer
     </a>
   );
 }
 
 // ==================== MOVIE DETAILS ====================
 
-function MovieDetails({ movie }: { movie: Movie }) {
+function MovieDetails({
+  movie,
+  trailerUrl,
+  onPlayTrailer,
+}: {
+  movie: Movie;
+  trailerUrl?: string;
+  onPlayTrailer: () => void;
+}) {
   return (
     <>
       <DetailItem label="Status" value={getMovieStatus(movie)} />
       <DetailItem label="Original Language" value={getMovieOriginalLanguage(movie)} />
       <DetailItem label="Starring" value={getMovieCastNames(movie, 3)} />
       <DetailItem label="Director" value={getMovieDirector(movie)} />
+
+      {/* Trailer Button at the bottom */}
+      <div className="mt-auto pt-3">
+        <TrailerButton trailerUrl={trailerUrl} onPlay={onPlayTrailer} />
+      </div>
     </>
   );
 }
