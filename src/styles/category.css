@@ -15,31 +15,55 @@
 .search-input {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid #FFF0C4;
+    border: 1px solid #CEAE76;
     border-radius: 8px;
-    background: #fff;
+    background: #3b0b0b;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.2s;
 }
 
 .search-input:focus {
-    border-color: #f5d7b7;
+    border-color: #CEAE76;
 }
 
 .search-button {
     padding: 0.75rem 2rem;
-    background: #FFF0C4;
-    color: #150804;
-    border: none;
+    background: #3b0b0b;
+    color: #FFF0C4;
+    border: 1px solid #CEAE76;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 240, 196, 0.55),
+            transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
 }
 
 .search-button:hover {
-    background: #f5d7b7;
+    color: #FFF0C4;
+    border-color: #FFF0C4;
+    background: #4a0e0e;
+}
+
+.search-button:hover::after {
+    left: 130%;
 }
 
 /* ==================== PANELS ==================== */
@@ -51,18 +75,41 @@
 .panel-header {
     padding: 1rem 1.25rem;
     background: #3b0b0b;
-    border: 2px solid #FFF0C4;
+    border: 1px solid #CEAE76;
     border-radius: 12px;
-    color: #fff;
+    color: #FFF0C4;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.2s;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
 .panel-header:hover {
     background: #4a0e0e;
+}
+
+.panel-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 240, 196, 0.45),
+            transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+}
+
+.panel-header:hover::after {
+    left: 130%;
 }
 
 .panel-arrow {
@@ -76,9 +123,11 @@
 .panel-content {
     padding: 1.25rem;
     background: #3b0b0b;
-    border: 2px solid #FFF0C4;
+    border: 1px solid #CEAE76;
     border-radius: 12px;
     color: #FFF0C4;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
 }
 
 /* ==================== SORT OPTIONS ==================== */
