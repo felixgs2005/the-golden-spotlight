@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { Container, Row, Col, Form, Button, Placeholder, Alert } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../styles/category.css";
 
@@ -8,7 +8,7 @@ const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 const DEFAULT_LANGUAGE = "en-US";
-const RESULTS_PER_PAGE = 16; // 4x4
+const RESULTS_PER_PAGE = 16;
 
 type MovieCard = {
   id: number;
@@ -27,7 +27,6 @@ function posterUrlFromPath(path?: string | null, size: "w342" | "w500" = "w342")
   return path ? `${IMAGE_BASE}/${size}${path}` : undefined;
 }
 
-// Convert TMDB discover/movie results item to MovieCard
 function mapDiscoverResult(item: any): MovieCard {
   return {
     id: item.id,
@@ -37,7 +36,6 @@ function mapDiscoverResult(item: any): MovieCard {
   };
 }
 
-// Convert movie credit (actor credits) to MovieCard
 function mapCreditToMovie(item: any): MovieCard {
   return {
     id: item.id,
@@ -47,7 +45,8 @@ function mapCreditToMovie(item: any): MovieCard {
   };
 }
 
-// ----------------------- GENRES (ids used by TMDB) -----------------------
+// ==================== GENRES ====================
+
 const GENRES: { id: number; name: string }[] = [
   { id: 28, name: "Action" },
   { id: 16, name: "Animation" },
@@ -70,7 +69,8 @@ const GENRES: { id: number; name: string }[] = [
   { id: 37, name: "Western" },
 ];
 
-// ----------------------- SORT OPTIONS -----------------------
+// ==================== SORT OPTIONS ====================
+
 const SORT_OPTIONS: { label: string; value: string }[] = [
   { label: "Titles (from A to Z)", value: "original_title.asc" },
   { label: "Titles (from Z to A)", value: "original_title.desc" },
@@ -82,7 +82,8 @@ const SORT_OPTIONS: { label: string; value: string }[] = [
   { label: "Release Dates - / +", value: "release_date.desc" },
 ];
 
-// ----------------------- API CALLS -----------------------
+// ==================== API CALLS ====================
+
 async function discoverMovies(params: Record<string, any>) {
   const resp = await axios.get(`${TMDB_BASE}/discover/movie`, {
     params: {
@@ -122,11 +123,10 @@ async function getPersonMovieCredits(personId: number) {
   return resp.data;
 }
 
-// ----------------------- COMPONENT -----------------------
+// ==================== MAIN COMPONENT ====================
+
 export default function Category() {
   const [state, setState] = useState<State>({ status: "idle" });
-
-  // Search / filters state
   const [query, setQuery] = useState("");
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
@@ -135,14 +135,13 @@ export default function Category() {
   const [dateFrom, setDateFrom] = useState<string | undefined>(undefined);
   const [dateTo, setDateTo] = useState<string | undefined>(undefined);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Build discover params memoized
   const discoverParams = useMemo(() => {
     const p: Record<string, any> = {
       sort_by: sortBy,
       page,
-      with_watch_monetization_types: "flatrate", // optional
+      with_watch_monetization_types: "flatrate",
     };
     if (selectedGenres.length > 0) p.with_genres = selectedGenres.join(",");
     if (dateFrom) p["primary_release_date.gte"] = dateFrom;
@@ -150,9 +149,9 @@ export default function Category() {
     return p;
   }, [sortBy, page, selectedGenres, dateFrom, dateTo]);
 
-  // Fetch default popular on mount or when no searchTerm
   useEffect(() => {
     let mounted = true;
+
     async function loadDefault() {
       setState({ status: "loading" });
       try {
@@ -169,7 +168,6 @@ export default function Category() {
       }
     }
 
-    // if there's no searchTerm and no filters applied -> show popular
     const noFilters =
       !searchTerm &&
       selectedGenres.length === 0 &&
@@ -180,7 +178,6 @@ export default function Category() {
     if (noFilters) {
       loadDefault();
     } else {
-      // if filters exist but no explicit search term, call discover
       fetchDiscover();
     }
 
@@ -190,7 +187,6 @@ export default function Category() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm, selectedGenres, dateFrom, dateTo, sortBy]);
 
-  // Fetch discover helper
   async function fetchDiscover() {
     setState({ status: "loading" });
     try {
@@ -203,7 +199,6 @@ export default function Category() {
     }
   }
 
-  // Search handler (search multi)
   async function handleSearchSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
     const q = query.trim();
@@ -211,7 +206,6 @@ export default function Category() {
     setSearchTerm(q || undefined);
 
     if (!q) {
-      // clear search -> fallback to discover/popular (effect will trigger)
       setSearchTerm(undefined);
       return;
     }
@@ -220,26 +214,15 @@ export default function Category() {
 
     try {
       const data = await searchMulti(q, 1);
-
-      // If there is a person result EXACT match or first person result; prefer person if query looks like a name?
-      // We'll look for first person in results; if present and there are no movie hits or user searched clearly actor name,
-      // we fetch that person's movie credits. Behavior: if there are movie hits too, include them as well (movies first).
       const results: any[] = data.results ?? [];
-
-      // Extract movie results
       const movieResults = results.filter((r) => r.media_type === "movie").map(mapDiscoverResult);
-
-      // If there are person results and there are no (or few) movie results, fetch person's credits
       const personResult = results.find((r) => r.media_type === "person");
 
       if ((movieResults.length === 0 || movieResults.length < 4) && personResult) {
         const credits = await getPersonMovieCredits(personResult.id);
-        // credits.cast is array of movies actor played in — map and sort by popularity / release_date
         const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie).sort((a: any, b: any) => {
-          // prefer more recent/popular — fallback to id
           return (b.year ?? 0) - (a.year ?? 0);
         });
-        // unique by id
         const unique = Array.from(new Map(creditsMovies.map((m) => [m.id, m])).values());
         const movies = unique.slice(0, RESULTS_PER_PAGE);
         const totalPages = 1;
@@ -247,13 +230,11 @@ export default function Category() {
         return;
       }
 
-      // Otherwise show movieResults; if not many movie results but person exists, append their credits
       let movies: MovieCard[] = movieResults;
       if (movies.length < RESULTS_PER_PAGE && personResult) {
         const credits = await getPersonMovieCredits(personResult.id);
         const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie);
         const merged = [...movies, ...creditsMovies];
-        // unique and slice
         const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values());
         movies = unique.slice(0, RESULTS_PER_PAGE);
       } else {
@@ -266,24 +247,23 @@ export default function Category() {
     }
   }
 
-  // Toggle genre selection
   function toggleGenre(id: number) {
     setPage(1);
     setSelectedGenres((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
   }
 
-  // Pagination handlers
   function goToPage(p: number) {
     if (p < 1) return;
     setPage(p);
   }
 
-  // UI render
   if (state.status === "error") {
     return (
-      <Container className="mt-3">
-        <Alert variant="danger">Error: {state.error}</Alert>
-      </Container>
+      <div className="category-page">
+        <Container className="mt-3">
+          <div className="error-alert">Error: {state.error}</div>
+        </Container>
+      </div>
     );
   }
 
@@ -291,7 +271,6 @@ export default function Category() {
     return <CategorySkeleton />;
   }
 
-  // success
   const { movies, totalPages } = state;
 
   return (
@@ -305,188 +284,41 @@ export default function Category() {
         />
 
         <Row className="mt-3">
-          {/* Left column: Sort + Filters */}
           <Col md={3}>
-            <div style={{ marginBottom: "1rem" }}>
-              <div
-                className="p-3 rounded"
-                style={{
-                  background: "#3b0b0b",
-                  border: "2px solid #f5d7b7",
-                  borderRadius: 12,
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-                onClick={() => setIsSortOpen((s) => !s)}
-              >
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>Sort by</div>
-                  <div style={{ transform: isSortOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</div>
-                </div>
-              </div>
+            <SortPanel
+              isOpen={isSortOpen}
+              onToggle={() => setIsSortOpen((s) => !s)}
+              sortBy={sortBy}
+              onSortChange={(value) => {
+                setSortBy(value);
+                setPage(1);
+              }}
+            />
 
-              {isSortOpen && (
-                <div
-                  className="p-3 mt-3"
-                  style={{
-                    background: "#3b0b0b",
-                    border: "2px solid #f5d7b7",
-                    borderRadius: 12,
-                    color: "#f5d7b7",
-                  }}
-                >
-                  {SORT_OPTIONS.map((s) => (
-                    <div
-                      key={s.value}
-                      onClick={() => {
-                        setSortBy(s.value);
-                        setPage(1);
-                      }}
-                      style={{
-                        padding: "0.45rem 0",
-                        cursor: "pointer",
-                        color: sortBy === s.value ? "#fff" : "#f5d7b7",
-                        fontSize: "0.95rem",
-                      }}
-                    >
-                      {s.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div
-                className="p-3 rounded"
-                style={{
-                  background: "#3b0b0b",
-                  border: "2px solid #f5d7b7",
-                  borderRadius: 12,
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-                onClick={() => setIsFilterOpen((s) => !s)}
-              >
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>Filter</div>
-                  <div style={{ transform: isFilterOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
-                    ▾
-                  </div>
-                </div>
-              </div>
-
-              {isFilterOpen && (
-                <div
-                  className="p-3 mt-3"
-                  style={{
-                    background: "#3b0b0b",
-                    border: "2px solid #f5d7b7",
-                    borderRadius: 12,
-                    color: "#f5d7b7",
-                  }}
-                >
-                  {/* Release dates */}
-                  <div className="mb-3">
-                    <div className="mb-2">Release dates</div>
-                    <div className="d-flex gap-2 align-items-center">
-                      <div style={{ fontSize: 12, minWidth: 40 }}>From</div>
-                      <Form.Control
-                        type="date"
-                        value={dateFrom ?? ""}
-                        onChange={(e) => {
-                          setDateFrom(e.target.value || undefined);
-                          setPage(1);
-                        }}
-                        style={{ maxWidth: 150, background: "#fff" }}
-                      />
-                    </div>
-
-                    <div className="d-flex gap-2 align-items-center mt-2">
-                      <div style={{ fontSize: 12, minWidth: 40 }}>To</div>
-                      <Form.Control
-                        type="date"
-                        value={dateTo ?? ""}
-                        onChange={(e) => {
-                          setDateTo(e.target.value || undefined);
-                          setPage(1);
-                        }}
-                        style={{ maxWidth: 150, background: "#fff" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Categories (genres) */}
-                  <div>
-                    <div className="mb-2">Categories</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                      {GENRES.map((g) => {
-                        const active = selectedGenres.includes(g.id);
-                        return (
-                          <div
-                            key={g.id}
-                            onClick={() => toggleGenre(g.id)}
-                            style={{
-                              cursor: "pointer",
-                              padding: "0.35rem 0.25rem",
-                              color: active ? "#150804" : "#f5d7b7",
-                              background: active ? "#f5d7b7" : "transparent",
-                              borderRadius: 6,
-                              fontSize: 14,
-                              transition: "all 0.15s ease",
-                            }}
-                          >
-                            {g.name}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <FilterPanel
+              isOpen={isFilterOpen}
+              onToggle={() => setIsFilterOpen((s) => !s)}
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onDateFromChange={(value) => {
+                setDateFrom(value || undefined);
+                setPage(1);
+              }}
+              onDateToChange={(value) => {
+                setDateTo(value || undefined);
+                setPage(1);
+              }}
+              selectedGenres={selectedGenres}
+              onToggleGenre={toggleGenre}
+            />
           </Col>
 
-          {/* Right column: Grid */}
           <Col md={9}>
-            <div
-              className="mb-3"
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-            >
-              <div style={{ color: "#fff" }}>
-                {state && (state as any).query ? (
-                  <span>
-                    Results for <strong style={{ color: "#f5d7b7" }}>{(state as any).query}</strong>
-                  </span>
-                ) : (
-                  <span>Discover</span>
-                )}
-              </div>
-
-              <div style={{ color: "#f5d7b7" }}>{movies.length} results</div>
-            </div>
+            <ResultsHeader query={state && (state as any).query} count={movies.length} />
 
             <PostersGrid movies={movies} />
 
-            <div className="mt-4 d-flex justify-content-center align-items-center gap-2">
-              <Button
-                variant="outline-light"
-                size="sm"
-                onClick={() => goToPage(page - 1)}
-                disabled={page <= 1}
-              >
-                Prev
-              </Button>
-              <div style={{ color: "#f5d7b7" }}>{page}</div>
-              <Button
-                variant="outline-light"
-                size="sm"
-                onClick={() => goToPage(page + 1)}
-                disabled={page >= (totalPages || 1)}
-              >
-                Next
-              </Button>
-            </div>
+            <Pagination currentPage={page} totalPages={totalPages} onPageChange={goToPage} />
           </Col>
         </Row>
       </Container>
@@ -494,7 +326,7 @@ export default function Category() {
   );
 }
 
-// ----------------------- SUB-COMPONENTS -----------------------
+// ==================== SEARCH BAR ====================
 
 function SearchBar({
   query,
@@ -508,111 +340,249 @@ function SearchBar({
   placeholder?: string;
 }) {
   return (
-    <form onSubmit={onSubmit}>
-      <div className="d-flex gap-2">
-        <Form.Control
-          placeholder={placeholder ?? "Search by movie, series or actor"}
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-        />
-        <Button type="submit" variant="primary">
-          Search
-        </Button>
-      </div>
+    <form onSubmit={onSubmit} className="search-bar">
+      <input
+        type="text"
+        className="search-input"
+        placeholder={placeholder ?? "Search by movie, series or actor"}
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
+      />
+      <button type="submit" className="search-button">
+        Search
+      </button>
     </form>
   );
 }
 
+// ==================== SORT PANEL ====================
+
+function SortPanel({
+  isOpen,
+  onToggle,
+  sortBy,
+  onSortChange,
+}: {
+  isOpen: boolean;
+  onToggle: () => void;
+  sortBy: string;
+  onSortChange: (value: string) => void;
+}) {
+  return (
+    <div className="panel-wrapper mb-3">
+      <div className="panel-header" onClick={onToggle}>
+        <div>Sort by</div>
+        <div className={`panel-arrow ${isOpen ? "open" : ""}`}>▾</div>
+      </div>
+
+      {isOpen && (
+        <div className="panel-content mt-3">
+          {SORT_OPTIONS.map((s) => (
+            <div
+              key={s.value}
+              onClick={() => onSortChange(s.value)}
+              className={`sort-option ${sortBy === s.value ? "active" : ""}`}
+            >
+              {s.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== FILTER PANEL ====================
+
+function FilterPanel({
+  isOpen,
+  onToggle,
+  dateFrom,
+  dateTo,
+  onDateFromChange,
+  onDateToChange,
+  selectedGenres,
+  onToggleGenre,
+}: {
+  isOpen: boolean;
+  onToggle: () => void;
+  dateFrom?: string;
+  dateTo?: string;
+  onDateFromChange: (value: string) => void;
+  onDateToChange: (value: string) => void;
+  selectedGenres: number[];
+  onToggleGenre: (id: number) => void;
+}) {
+  return (
+    <div className="panel-wrapper">
+      <div className="panel-header" onClick={onToggle}>
+        <div>Filter</div>
+        <div className={`panel-arrow ${isOpen ? "open" : ""}`}>▾</div>
+      </div>
+
+      {isOpen && (
+        <div className="panel-content mt-3">
+          <div className="filter-section mb-3">
+            <div className="filter-label mb-2">Release dates</div>
+
+            <div className="date-input-group">
+              <span className="date-label">From</span>
+              <input
+                type="date"
+                className="date-input"
+                value={dateFrom ?? ""}
+                onChange={(e) => onDateFromChange(e.target.value)}
+              />
+            </div>
+
+            <div className="date-input-group mt-2">
+              <span className="date-label">To</span>
+              <input
+                type="date"
+                className="date-input"
+                value={dateTo ?? ""}
+                onChange={(e) => onDateToChange(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="filter-section">
+            <div className="filter-label mb-2">Categories</div>
+            <div className="genres-grid">
+              {GENRES.map((g) => (
+                <div
+                  key={g.id}
+                  onClick={() => onToggleGenre(g.id)}
+                  className={`genre-tag ${selectedGenres.includes(g.id) ? "active" : ""}`}
+                >
+                  {g.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== RESULTS HEADER ====================
+
+function ResultsHeader({ query, count }: { query?: string; count: number }) {
+  return (
+    <div className="results-header mb-3">
+      <div className="results-title">
+        {query ? (
+          <>
+            Results for <strong>{query}</strong>
+          </>
+        ) : (
+          "Discover"
+        )}
+      </div>
+      <div className="results-count">{count} results</div>
+    </div>
+  );
+}
+
+// ==================== POSTERS GRID ====================
+
 function PostersGrid({ movies }: { movies: MovieCard[] }) {
   if (!movies || movies.length === 0) {
-    return <div style={{ color: "#f5d7b7" }}>No results</div>;
+    return <div className="no-results">No results</div>;
   }
 
   return (
     <Row className="g-3">
       {movies.map((m) => (
         <Col key={m.id} xs={6} md={3}>
-          <Link to={`/film/${m.id}`} className="text-decoration-none">
-            <div
-              style={{
-                borderRadius: 8,
-                overflow: "hidden",
-                position: "relative",
-                minHeight: 1,
-                background: "#222",
-              }}
-            >
-              {m.posterUrl ? (
-                <img
-                  src={m.posterUrl}
-                  alt={m.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <div style={{ width: "100%", paddingTop: "150%", background: "#333" }}>
-                  <div style={{ padding: 12, color: "#666" }}>No poster</div>
-                </div>
-              )}
-
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: "0.5rem",
-                  background: "linear-gradient(180deg, transparent, rgba(21,8,4,0.9))",
-                  color: "#f5d7b7",
-                  fontWeight: 600,
-                  fontSize: 14,
-                }}
-              >
-                <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {m.title}
-                </div>
-                <div style={{ fontSize: 12, color: "#f0d7b7", opacity: 0.9 }}>{m.year}</div>
-              </div>
-            </div>
-          </Link>
+          <MovieCard movie={m} />
         </Col>
       ))}
     </Row>
   );
 }
 
+function MovieCard({ movie }: { movie: MovieCard }) {
+  return (
+    <Link to={`/film/${movie.id}`} className="movie-card">
+      <div className="movie-card-image">
+        {movie.posterUrl ? (
+          <img src={movie.posterUrl} alt={movie.title} />
+        ) : (
+          <div className="movie-card-placeholder">
+            <span>No poster</span>
+          </div>
+        )}
+
+        <div className="movie-card-overlay">
+          <div className="movie-card-title">{movie.title}</div>
+          <div className="movie-card-year">{movie.year}</div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ==================== PAGINATION ====================
+
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  return (
+    <div className="pagination mt-4">
+      <button
+        className="pagination-button"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage <= 1}
+      >
+        Prev
+      </button>
+      <div className="pagination-current">{currentPage}</div>
+      <button
+        className="pagination-button"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
+// ==================== SKELETON ====================
+
 function CategorySkeleton() {
   return (
-    <Container className="mt-3">
-      <Placeholder as="div" animation="glow">
-        <Placeholder xs={12} style={{ height: 56, borderRadius: 8 }} />
-      </Placeholder>
+    <div className="category-page">
+      <Container className="mt-3">
+        <div className="skeleton skeleton-search" />
 
-      <Row className="mt-3">
-        <Col md={3}>
-          <Placeholder as="div" animation="glow" className="p-3" style={{ borderRadius: 12 }}>
-            <Placeholder xs={12} style={{ height: 40 }} />
-            <div className="mt-3">
-              <Placeholder xs={12} style={{ height: 200 }} />
-            </div>
-          </Placeholder>
-        </Col>
+        <Row className="mt-3">
+          <Col md={3}>
+            <div className="skeleton skeleton-panel mb-3" />
+            <div className="skeleton skeleton-panel" />
+          </Col>
 
-        <Col md={9}>
-          <div>
-            <Placeholder as="div" animation="glow">
-              <Placeholder xs={8} />
-            </Placeholder>
-          </div>
+          <Col md={9}>
+            <div className="skeleton skeleton-header mb-3" />
 
-          <Row className="g-3 mt-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Col key={i} xs={6} md={3}>
-                <Placeholder as="div" animation="glow" style={{ height: 220, borderRadius: 8 }} />
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-    </Container>
+            <Row className="g-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Col key={i} xs={6} md={3}>
+                  <div className="skeleton skeleton-card" />
+                </Col>
+              ))}
+            </Row>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }

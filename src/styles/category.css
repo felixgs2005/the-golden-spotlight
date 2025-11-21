@@ -1,0 +1,376 @@
+/* ==================== LAYOUT ==================== */
+
+.category-page {
+    background: #150804;
+    min-height: 100vh;
+}
+
+/* ==================== SEARCH BAR ==================== */
+
+.search-bar {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #FFF0C4;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: #f5d7b7;
+}
+
+.search-button {
+    padding: 0.75rem 2rem;
+    background: #FFF0C4;
+    color: #150804;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-button:hover {
+    background: #f5d7b7;
+}
+
+/* ==================== PANELS ==================== */
+
+.panel-wrapper {
+    margin-bottom: 1rem;
+}
+
+.panel-header {
+    padding: 1rem 1.25rem;
+    background: #3b0b0b;
+    border: 2px solid #FFF0C4;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.panel-header:hover {
+    background: #4a0e0e;
+}
+
+.panel-arrow {
+    transition: transform 0.3s ease;
+}
+
+.panel-arrow.open {
+    transform: rotate(180deg);
+}
+
+.panel-content {
+    padding: 1.25rem;
+    background: #3b0b0b;
+    border: 2px solid #FFF0C4;
+    border-radius: 12px;
+    color: #FFF0C4;
+}
+
+/* ==================== SORT OPTIONS ==================== */
+
+.sort-option {
+    padding: 0.45rem 0;
+    cursor: pointer;
+    color: #FFF0C4;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.sort-option:hover {
+    color: #fff;
+}
+
+.sort-option.active {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ==================== FILTERS ==================== */
+
+.filter-label {
+    font-weight: 600;
+    color: #FFF0C4;
+}
+
+.date-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.date-label {
+    font-size: 0.75rem;
+    min-width: 40px;
+    color: #FFF0C4;
+}
+
+.date-input {
+    flex: 1;
+    max-width: 150px;
+    padding: 0.35rem 0.5rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #150804;
+}
+
+.genres-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.genre-tag {
+    cursor: pointer;
+    padding: 0.35rem 0.5rem;
+    color: #FFF0C4;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    text-align: center;
+    transition: all 0.15s ease;
+}
+
+.genre-tag:hover {
+    background: rgba(255, 240, 196, 0.1);
+}
+
+.genre-tag.active {
+    color: #150804;
+    background: #FFF0C4;
+    font-weight: 600;
+}
+
+/* ==================== RESULTS HEADER ==================== */
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.results-title {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.results-title strong {
+    color: #FFF0C4;
+}
+
+.results-count {
+    color: #FFF0C4;
+    font-size: 0.95rem;
+}
+
+.no-results {
+    color: #FFF0C4;
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.1rem;
+}
+
+/* ==================== MOVIE CARD ==================== */
+
+.movie-card {
+    text-decoration: none;
+    display: block;
+    border: 1px solid #FFF0C4;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+
+    .movie-card-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.75rem;
+        color: #FFF0C4;
+        display: inline;
+    }
+}
+
+.movie-card-image {
+    position: relative;
+    width: 100%;
+    padding-top: 150%;
+    background: #222;
+    overflow: hidden;
+}
+
+.movie-card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-card-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+}
+
+.movie-card-placeholder span {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.movie-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem;
+    color: #FFF0C4;
+    display: none;
+}
+
+.movie-card-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.movie-card-year {
+    font-size: 0.75rem;
+    color: #f0d7b7;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+}
+
+/* ==================== PAGINATION ==================== */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pagination-button {
+    padding: 0.5rem 1.25rem;
+    background: transparent;
+    color: #FFF0C4;
+    border: 1px solid #FFF0C4;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background: #FFF0C4;
+    color: #150804;
+}
+
+.pagination-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-current {
+    color: #FFF0C4;
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* ==================== ERROR ALERT ==================== */
+
+.error-alert {
+    padding: 1rem 1.5rem;
+    background: #dc3545;
+    color: white;
+    border-radius: 8px;
+}
+
+/* ==================== SKELETON ==================== */
+
+.skeleton {
+    background: linear-gradient(90deg, #3b0b0b 25%, #4a0e0e 50%, #3b0b0b 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-search {
+    height: 56px;
+    width: 100%;
+}
+
+.skeleton-panel {
+    height: 200px;
+    width: 100%;
+}
+
+.skeleton-header {
+    height: 30px;
+    width: 200px;
+}
+
+.skeleton-card {
+    width: 100%;
+    padding-top: 150%;
+    position: relative;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .genres-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-bar {
+        flex-direction: column;
+    }
+
+    .search-button {
+        width: 100%;
+    }
+}
