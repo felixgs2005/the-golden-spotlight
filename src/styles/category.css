@@ -12,6 +12,19 @@
     gap: 0.5rem;
 }
 
+input::placeholder,
+textarea::placeholder {
+    color: #c8b89aba;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+    transition: opacity 0.2s ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+    opacity: 0;
+}
+
 .search-input {
     flex: 1;
     padding: 0.75rem 1rem;
@@ -19,6 +32,10 @@
     border-radius: 8px;
     background: #3b0b0b;
     font-size: 1rem;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+    color: #FFF0C4 !important;
+    caret-color: #FFF0C4 !important;
     outline: none;
     transition: border-color 0.2s;
 }
@@ -133,19 +150,28 @@
 /* ==================== SORT OPTIONS ==================== */
 
 .sort-option {
-    padding: 0.45rem 0;
+    padding: 0.35rem 0.75rem;
+    margin: 0.1rem 0;
     cursor: pointer;
+
     color: #FFF0C4;
+    background: transparent;
+    border-radius: 6px;
+
     font-size: 0.95rem;
-    transition: color 0.2s;
+    font-weight: 400;
+    display: block;
+
+    transition: all 0.15s ease;
 }
 
 .sort-option:hover {
-    color: #fff;
+    background: rgba(255, 240, 196, 0.1);
 }
 
 .sort-option.active {
-    color: #fff;
+    color: #150804;
+    background: #FFF0C4;
     font-weight: 600;
 }
 
@@ -171,12 +197,34 @@
 .date-input {
     flex: 1;
     max-width: 150px;
-    padding: 0.35rem 0.5rem;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #150804;
+    padding: 0.45rem 0.75rem;
+    background: #FFF8E8;
+    border: 1px solid #CEAE76;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    color: #3b0b0b;
+    caret-color: #3b0b0b;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.date-input::placeholder {
+    color: rgba(59, 11, 11, 0.45);
+}
+
+.date-input:hover {
+    border-color: #FFF0C4;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #FFF0C4;
+    background: #FFF3D5;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    filter: brightness(0) saturate(100%) invert(30%) sepia(60%) saturate(300%) hue-rotate(350deg);
+    cursor: pointer;
 }
 
 .genres-grid {
