@@ -290,11 +290,14 @@ function ActorCard({ actor }: { actor: any }) {
             height: 100,
             borderRadius: "50%",
             background: "#333",
+            marginBottom: 8,
           }}
         />
       )}
-      <p className="name-actor text-light mb-0">{actor.name}</p>
-      <div className="actor-known-for">Known For →</div>
+      <p className="name-actor text-light mb-1">{actor.name}</p>
+      <Link to={`/actor/${actor.id}`} className="actor-known-for text-decoration-none text-warning">
+        Known For →
+      </Link>
     </div>
   );
 }

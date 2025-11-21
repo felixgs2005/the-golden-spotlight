@@ -1,0 +1,85 @@
+.actor-page {
+  background: #150804;
+  min-height: 100vh;
+  color: #FFF0C4;
+}
+
+.actor-photo {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid #FFF0C4;
+  object-fit: cover;
+}
+
+.actor-photo-placeholder {
+  width: 100%;
+  padding-top: 150%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 2px solid #FFF0C4;
+}
+
+.actor-name {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #FFF0C4;
+}
+
+.actor-biography {
+  margin-top: 1rem;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.actor-movies-title {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #FFF0C4;
+}
+
+/* Movie Card */
+.movie-card {
+  display: block;
+  text-decoration: none;
+  color: #FFF0C4;
+}
+
+.movie-card-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #FFF0C4;
+  object-fit: cover;
+}
+
+.movie-card-placeholder {
+  width: 100%;
+  padding-top: 150%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #FFF0C4;
+  color: #666;
+}
+
+.movie-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-card-year {
+  font-size: 0.75rem;
+  color: #f0d7b7;
+  opacity: 0.9;
+}
