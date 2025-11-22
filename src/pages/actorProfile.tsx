@@ -134,21 +134,53 @@ export default function ActorProfile() {
           .sort((a: MovieCard, b: MovieCard) => Number(b.year) - Number(a.year))
           .slice(0, 7);
 
-        // Fetch similar actors (popular actors in same department)
-        const popularResp = await axios.get(`${TMDB_BASE}/person/popular`, {
-          params: { api_key: TMDB_API_KEY, language: DEFAULT_LANGUAGE },
+        // Récupérer les co-stars (acteurs avec qui cette personne a travaillé)
+        const coStarsMap = new Map<
+          number,
+          { id: number; name: string; profile_path: string | null; count: number }
+        >();
+
+        // Pour chaque film, récupérer le cast
+        const movieIds = allMovies.slice(0, 10).map((m: any) => m.id); // Limiter à 10 films pour la performance
+
+        const castPromises = movieIds.map(async (movieId: number) => {
+          try {
+            const response = await axios.get(`${TMDB_BASE}/movie/${movieId}/credits`, {
+              params: { api_key: TMDB_API_KEY },
+            });
+            return response.data.cast || [];
+          } catch {
+            return [];
+          }
         });
 
-        const similarActors = (popularResp.data.results ?? [])
-          .filter(
-            (p: any) => p.id !== actor.id && p.known_for_department === actor.known_for_department
-          )
-          .slice(0, 5)
-          .map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            profile_path: p.profile_path,
-          }));
+        const allCasts = await Promise.all(castPromises);
+
+        // Compter les collaborations
+        allCasts.forEach((cast: any[]) => {
+          cast.slice(0, 10).forEach((castMember: any) => {
+            if (castMember.id !== actor.id) {
+              // Exclure l'acteur lui-même
+              const existing = coStarsMap.get(castMember.id);
+              if (existing) {
+                existing.count++;
+              } else {
+                coStarsMap.set(castMember.id, {
+                  id: castMember.id,
+                  name: castMember.name,
+                  profile_path: castMember.profile_path,
+                  count: 1,
+                });
+              }
+            }
+          });
+        });
+
+        // Trier par nombre de collaborations et prendre les 12 premiers
+        const similarActors = Array.from(coStarsMap.values())
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 12)
+          .map(({ id, name, profile_path }) => ({ id, name, profile_path }));
 
         setState({ status: "success", actor, movies: topMovies, totalCredits, similarActors });
       } catch (e) {
@@ -491,36 +523,36 @@ function SeeAlsoSection({ actors }: { actors: SimilarActor[] }) {
 
   return (
     <section className="see-also-section py-5">
-      <Container>
-        <h2 className="section-title mb-4">See Also</h2>
+      <h2 className="section-title mb-4">Worked With</h2>
 
-        <div className="similar-actors-grid">
-          {actors.map((actor) => (
-            <SimilarActorCard key={actor.id} actor={actor} />
-          ))}
-        </div>
-      </Container>
+      <div className="similar-actors-scroll">
+        {actors.map((actor) => (
+          <SimilarActorCard key={actor.id} actor={actor} />
+        ))}
+      </div>
     </section>
   );
 }
 
 function SimilarActorCard({ actor }: { actor: SimilarActor }) {
   return (
-    <div className="similar-actor-card">
-      {actor.profile_path ? (
-        <img
-          src={posterUrlFromPath(actor.profile_path)}
-          alt={actor.name}
-          className="similar-actor-photo"
-        />
-      ) : (
-        <div className="similar-actor-photo-placeholder">?</div>
-      )}
+    <Link to={`/actor/${actor.id}`} className="similar-actor-card">
+      <div className="similar-actor-photo-container">
+        {actor.profile_path ? (
+          <img
+            src={posterUrlFromPath(actor.profile_path)}
+            alt={actor.name}
+            className="similar-actor-photo"
+          />
+        ) : (
+          <div className="similar-actor-photo-placeholder">
+            <span>?</span>
+          </div>
+        )}
+      </div>
       <p className="similar-actor-name">{actor.name}</p>
-      <Link to={`/actor/${actor.id}`} className="actor-known-for">
-        Known For →
-      </Link>
-    </div>
+      <span className="actor-view-profile">View Profile →</span>
+    </Link>
   );
 }
 
