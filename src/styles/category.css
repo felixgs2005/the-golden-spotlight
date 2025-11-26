@@ -332,7 +332,7 @@ textarea:focus::placeholder {
 
 /* Darken + slight zoom on hover */
 .movie-card:hover .movie-card-image img {
-    filter: brightness(0.55) contrast(1.05);
+    filter: brightness(0.5) contrast(1.05);
     transform: scale(1.03);
 }
 
