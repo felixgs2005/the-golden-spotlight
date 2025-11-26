@@ -61,7 +61,7 @@ export default function FilmDetails() {
 
   const { movie } = state;
   const rating = getMovieRating(movie);
-  const topCast = getTopCast(movie, 5);
+  const topCast = getTopCast(movie, 12);
   const similarMovies = getSimilarMovies(movie, 6);
   const trailerUrl = getTrailerUrl(movie);
 
@@ -200,22 +200,112 @@ function RatingDisplay({ rating }: { rating: ReturnType<typeof getMovieRating> }
 
   return (
     <div className="rating mb-2">
-      <span className="text-warning">{rating.stars}</span> {rating.percentage}
+      <span className="">{rating.stars}</span> {rating.percentage}
     </div>
   );
 }
 
 // ==================== TRAILER BUTTON ====================
 
-function TrailerButton({ trailerUrl }: { trailerUrl?: string }) {
+function TrailerButton({ trailerUrl, onPlay }: { trailerUrl?: string; onPlay: () => void }) {
   if (!trailerUrl) {
     return <span className="text-muted mt-auto">No trailer available</span>;
   }
 
   return (
-    <a href={trailerUrl} target="_blank" rel="noreferrer" className="play-button mt-auto">
+    <button onClick={onPlay} className="play-button mt-auto">
       ▶ Trailer
-    </a>
+    </button>
+  );
+}
+
+// ==================== TRAILER MODAL ====================
+
+function TrailerModal({ trailerUrl, onClose }: { trailerUrl: string; onClose: () => void }) {
+  useEffect(() => {
+    // Bloquer le scroll du body quand le modal est ouvert
+    document.body.style.overflow = "hidden";
+
+    // Fermer avec la touche Escape
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = "auto";
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
+
+  // Convertir l'URL YouTube en embed
+  const embedUrl = trailerUrl.includes("watch?v=")
+    ? trailerUrl.replace("watch?v=", "embed/")
+    : trailerUrl;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.9)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9999,
+        padding: "20px",
+      }}
+      onClick={onClose}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          background: "transparent",
+          border: "none",
+          color: "#FFF0C4",
+          fontSize: "2rem",
+          cursor: "pointer",
+          zIndex: 10000,
+          padding: "10px",
+          lineHeight: 1,
+        }}
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      {/* Video container */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "1000px",
+          aspectRatio: "16/9",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <iframe
+          src={embedUrl}
+          title="Movie Trailer"
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            borderRadius: "8px",
+          }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </div>
   );
 }
 
@@ -263,8 +353,8 @@ function ActorsSection({ actors }: { actors: any[] }) {
     <section className="actors-section py-5">
       <div className="container">
         <h2 className="text-light mb-4">Actors</h2>
-        <div className="d-flex flex-wrap justify-content-center gap-4 text-center">
-          {actors.map((actor) => (
+        <div className="actors-scroll-container">
+          {actors.slice(0, 12).map((actor) => (
             <ActorCard key={actor.id} actor={actor} />
           ))}
         </div>
@@ -295,7 +385,7 @@ function ActorCard({ actor }: { actor: any }) {
         />
       )}
       <p className="name-actor text-light mb-1">{actor.name}</p>
-      <Link to={`/actor/${actor.id}`} className="actor-known-for text-decoration-none text-warning">
+      <Link to={`/actor/${actor.id}`} className="actor-known-for text-decoration-none">
         Known For →
       </Link>
     </div>

@@ -1,3 +1,5 @@
+/* ==================== BASE STYLES ==================== */
+
 .film-hero {
     background-size: cover;
     background-position: center;
@@ -24,12 +26,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+}
 
+/* ==================== DETAIL ITEMS ==================== */
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item strong {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-top: 30px;
 }
 
 .resultDetailsRight {
-    font-size: 14px;
+    font-size: 1rem;
+    line-height: 1.4;
 }
+
+/* ==================== PLAY BUTTON ==================== */
 
 .play-button {
     position: absolute;
@@ -50,25 +69,56 @@
     font-family: 'Montserrat', Arial, Helvetica, sans-serif;
     font-size: 20px;
     z-index: 10;
-
-    clip-path: polygon(10% 0%,
-            /* coin haut gauche coupé */
-            100% 0%,
-            100% 100%,
-            10% 100%,
-            /* coin bas gauche coupé */
-            0% 50%
-            /* pointe gauche */
-        );
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 10% 100%, 0% 50%);
 }
+
+.play-button:hover {
+    background-color: #8C1007;
+    color: #FFF0C4;
+}
+
+/* ==================== ACTORS SCROLL CONTAINER ==================== */
+
+.actors-scroll-container {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 1rem;
+    scroll-behavior: smooth;
+}
+
+/* Scrollbar styling */
+.actors-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.actors-scroll-container::-webkit-scrollbar-track {
+    background: #2a0a0a;
+    border-radius: 4px;
+}
+
+.actors-scroll-container::-webkit-scrollbar-thumb {
+    background: #FFF0C4;
+    border-radius: 4px;
+}
+
+.actors-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #CEAE76;
+}
+
+/* ==================== ACTOR CARD ==================== */
 
 .actor-card {
     width: 200px;
+    min-width: 200px;
     min-height: 250px;
     display: flex;
     flex-direction: column;
     align-items: center;
     border: 1px solid #FFF0C4;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .actor-card img {
@@ -80,10 +130,9 @@
 }
 
 .actor-card:hover {
-    transform: translateY(-10px);
     box-shadow: 0 12px 24px rgba(140, 16, 7, 0.5);
     background: linear-gradient(#0a0a0a 40%, #0a0a0a 80%, #8C1007 80%);
-    border-color: #f5d7b7;
+    border-color: #FFF0C4;
 }
 
 .actor-card:hover img {
@@ -92,7 +141,7 @@
 }
 
 .actor-known-for {
-    color: #f5d7b7;
+    color: #FFF0C4;
     width: 100%;
     padding-top: 35px;
     text-align: center;
@@ -108,4 +157,197 @@
 .actor-card:hover .actor-known-for {
     opacity: 1;
     max-height: 60px;
+}
+
+/* ==================== RESPONSIVE TABLET ==================== */
+
+@media (max-width: 992px) {
+    .film-hero {
+        min-height: 35vh;
+    }
+
+    .play-button {
+        font-size: 18px;
+        padding: 5px 25px;
+        gap: 15px;
+        bottom: 45px;
+        left: 65%;
+    }
+
+    .detail-item strong {
+        font-size: 0.7rem;
+        margin-top: 20px;
+    }
+
+    .resultDetailsRight {
+        font-size: 0.95rem;
+    }
+
+    .actor-card {
+        width: 180px;
+        min-height: 230px;
+    }
+}
+
+/* ==================== RESPONSIVE MOBILE ==================== */
+
+@media (max-width: 768px) {
+    .film-hero {
+        min-height: auto;
+        padding-bottom: 2rem !important;
+    }
+
+    .over-overlay {
+        flex-direction: column !important;
+    }
+
+    .poster {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 2rem !important;
+    }
+
+    /* Réorganiser les colonnes sur mobile */
+    .over-overlay>.col-md-8 {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    /* Movie info prend toute la largeur */
+    .over-overlay .row>div {
+        width: 100% !important;
+        margin-top: 0 !important;
+    }
+
+    /* Bouton trailer repositionné */
+    .play-button {
+        position: static;
+        transform: none;
+        margin: 2rem auto 0;
+        width: fit-content;
+        font-size: 16px;
+        padding: 8px 24px;
+        gap: 12px;
+    }
+
+    /* Detail items en mode mobile */
+    .detail-item {
+        display: none;
+    }
+
+    /* Actors section */
+    .actors-scroll-container {
+        gap: 1rem;
+    }
+
+    .actor-card {
+        width: 150px;
+        min-width: 150px;
+        min-height: 200px;
+    }
+
+    .actor-card img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .name-actor {
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+
+    /* Similar section carousel */
+    .similar-section>div>div {
+        height: 25rem !important;
+    }
+
+    .similar-section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ==================== RESPONSIVE PETIT MOBILE ==================== */
+
+@media (max-width: 480px) {
+    .film-hero {
+        background-position: center top;
+    }
+
+    h1.fw-bold {
+        font-size: 1.75rem !important;
+    }
+
+    .d-flex.gap-2 {
+        font-size: 0.85rem;
+    }
+
+    .badge-age {
+        font-size: 0.7rem !important;
+    }
+
+    .play-button {
+        font-size: 14px;
+        padding: 6px 20px;
+        gap: 10px;
+    }
+
+    .actor-card {
+        width: 130px;
+        min-width: 130px;
+        min-height: 180px;
+    }
+
+    .actor-card img {
+        width: 70px !important;
+        height: 70px !important;
+        margin-top: 10px;
+    }
+
+    .name-actor {
+        font-size: 0.85rem;
+        margin-top: 15px;
+    }
+
+    /* Similar section plus compact */
+    .similar-section>div>div {
+        height: 20rem !important;
+    }
+
+    .similar-section h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Flèches du carousel plus petites */
+    .similar-section .fa-angle-left,
+    .similar-section .fa-angle-right {
+        font-size: 20px !important;
+    }
+}
+
+/* ==================== RESPONSIVE TRÈS PETIT MOBILE ==================== */
+
+@media (max-width: 360px) {
+    .poster {
+        max-width: 250px;
+    }
+
+    h1.fw-bold {
+        font-size: 1.5rem !important;
+    }
+
+    .actor-card {
+        width: 110px;
+        min-width: 110px;
+        min-height: 160px;
+    }
+
+    .actor-card img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .play-button {
+        font-size: 12px;
+        padding: 5px 18px;
+    }
 }

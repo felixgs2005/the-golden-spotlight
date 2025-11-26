@@ -74,12 +74,12 @@ const GENRES: { id: number; name: string }[] = [
 const SORT_OPTIONS: { label: string; value: string }[] = [
   { label: "Titles (from A to Z)", value: "original_title.asc" },
   { label: "Titles (from Z to A)", value: "original_title.desc" },
-  { label: "Popularity + / -", value: "popularity.asc" },
-  { label: "Popularity - / +", value: "popularity.desc" },
-  { label: "Rating + / -", value: "vote_average.asc" },
-  { label: "Rating - / +", value: "vote_average.desc" },
-  { label: "Release Dates + / -", value: "release_date.asc" },
-  { label: "Release Dates - / +", value: "release_date.desc" },
+  { label: "Popularity - / +", value: "popularity.asc" },
+  { label: "Popularity + / -", value: "popularity.desc" },
+  { label: "Rating - / +", value: "vote_average.asc" },
+  { label: "Rating + / -", value: "vote_average.desc" },
+  { label: "Release Dates - / +", value: "release_date.asc" },
+  { label: "Release Dates + / -", value: "release_date.desc" },
 ];
 
 // ==================== API CALLS ====================
@@ -168,8 +168,12 @@ export default function Category() {
       }
     }
 
+    // Si on a un terme de recherche, on ne fait RIEN ici
+    if (searchTerm) {
+      return;
+    }
+
     const noFilters =
-      !searchTerm &&
       selectedGenres.length === 0 &&
       !dateFrom &&
       !dateTo &&
@@ -187,6 +191,8 @@ export default function Category() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm, selectedGenres, dateFrom, dateTo, sortBy]);
 
+  // ==================== FONCTION FETCH DISCOVER ====================
+
   async function fetchDiscover() {
     setState({ status: "loading" });
     try {
@@ -199,49 +205,101 @@ export default function Category() {
     }
   }
 
+  // ==================== FONCTION SEARCH ====================
+
   async function handleSearchSubmit(e?: React.FormEvent) {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     const q = query.trim();
     setPage(1);
-    setSearchTerm(q || undefined);
 
     if (!q) {
+      // Si la recherche est vide, on revient au mode découverte
       setSearchTerm(undefined);
       return;
     }
+
+    // Important : on met à jour searchTerm pour bloquer le useEffect
+    setSearchTerm(q);
 
     setState({ status: "loading" });
 
     try {
       const data = await searchMulti(q, 1);
       const results: any[] = data.results ?? [];
-      const movieResults = results.filter((r) => r.media_type === "movie").map(mapDiscoverResult);
+
+      // Séparer les films et personnes
+      let movieResults = results.filter((r) => r.media_type === "movie").map(mapDiscoverResult);
+
       const personResult = results.find((r) => r.media_type === "person");
 
-      if ((movieResults.length === 0 || movieResults.length < 4) && personResult) {
-        const credits = await getPersonMovieCredits(personResult.id);
-        const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie).sort((a: any, b: any) => {
-          return (b.year ?? 0) - (a.year ?? 0);
-        });
-        const unique = Array.from(new Map(creditsMovies.map((m) => [m.id, m])).values());
-        const movies = unique.slice(0, RESULTS_PER_PAGE);
-        const totalPages = 1;
+      // Fonction pour scorer la pertinence d'un film
+      const scoreMovie = (movie: MovieCard, searchQuery: string) => {
+        const title = (movie.title || "").toLowerCase();
+        const search = searchQuery.toLowerCase();
+        let score = 0;
+
+        // Correspondance exacte = score max
+        if (title === search) score += 1000;
+        // Commence par le terme recherché
+        else if (title.startsWith(search)) score += 500;
+        // Contient le terme recherché
+        else if (title.includes(search)) score += 100;
+
+        // Bonus pour les films récents (priorité aux nouveaux)
+        const year = parseInt(movie.year || "0");
+        if (year >= 2020) score += 50;
+        else if (year >= 2010) score += 30;
+        else if (year >= 2000) score += 10;
+
+        return score;
+      };
+
+      // Trier les films par pertinence
+      movieResults = movieResults.sort((a, b) => {
+        return scoreMovie(b, q) - scoreMovie(a, q);
+      });
+
+      // Si on a trouvé des films pertinents, on les affiche
+      if (movieResults.length > 0) {
+        const movies: MovieCard[] = movieResults.slice(0, RESULTS_PER_PAGE);
+        const totalPages = Math.ceil(movieResults.length / RESULTS_PER_PAGE);
         setState({ status: "success", movies, totalPages, page: 1, query: q });
         return;
       }
 
-      let movies: MovieCard[] = movieResults;
-      if (movies.length < RESULTS_PER_PAGE && personResult) {
+      // Sinon, si c'est une personne, on affiche ses films
+      if (personResult) {
         const credits = await getPersonMovieCredits(personResult.id);
-        const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie);
-        const merged = [...movies, ...creditsMovies];
-        const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values());
-        movies = unique.slice(0, RESULTS_PER_PAGE);
-      } else {
-        movies = movies.slice(0, RESULTS_PER_PAGE);
+        const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie).sort((a: any, b: any) => {
+          const yearA = parseInt(a.year || "0");
+          const yearB = parseInt(b.year || "0");
+          return yearB - yearA;
+        });
+
+        const unique = Array.from(
+          new Map(creditsMovies.map((m) => [m.id, m])).values()
+        ) as MovieCard[];
+        const movies = unique.slice(0, RESULTS_PER_PAGE);
+        setState({
+          status: "success",
+          movies,
+          totalPages: 1,
+          page: 1,
+        });
+        return;
       }
 
-      setState({ status: "success", movies, totalPages: 1, page: 1, query: q });
+      // Aucun résultat trouvé
+      setState({
+        status: "success",
+        movies: [],
+        totalPages: 1,
+        page: 1,
+      });
     } catch (e) {
       setState({ status: "error", error: String(e) });
     }
