@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import "../styles/actorProfile.css";
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -134,14 +134,12 @@ export default function ActorProfile() {
           .sort((a: MovieCard, b: MovieCard) => Number(b.year) - Number(a.year))
           .slice(0, 7);
 
-        // Récupérer les co-stars (acteurs avec qui cette personne a travaillé)
         const coStarsMap = new Map<
           number,
           { id: number; name: string; profile_path: string | null; count: number }
         >();
 
-        // Pour chaque film, récupérer le cast
-        const movieIds = allMovies.slice(0, 10).map((m: any) => m.id); // Limiter à 10 films pour la performance
+        const movieIds = allMovies.slice(0, 10).map((m: any) => m.id);
 
         const castPromises = movieIds.map(async (movieId: number) => {
           try {
@@ -156,11 +154,9 @@ export default function ActorProfile() {
 
         const allCasts = await Promise.all(castPromises);
 
-        // Compter les collaborations
         allCasts.forEach((cast: any[]) => {
           cast.slice(0, 10).forEach((castMember: any) => {
             if (castMember.id !== actor.id) {
-              // Exclure l'acteur lui-même
               const existing = coStarsMap.get(castMember.id);
               if (existing) {
                 existing.count++;
@@ -176,7 +172,6 @@ export default function ActorProfile() {
           });
         });
 
-        // Trier par nombre de collaborations et prendre les 12 premiers
         const similarActors = Array.from(coStarsMap.values())
           .sort((a, b) => b.count - a.count)
           .slice(0, 12)
@@ -216,15 +211,20 @@ export default function ActorProfile() {
   return (
     <div className="actor-page">
       <Container className="py-5">
-        <Row>
-          <Col md={4}>
+        <div className="actor-hero">
+          <div>
             <ActorPhoto actor={actor} />
             <PersonalInformation actor={actor} age={age} totalCredits={totalCredits} />
-          </Col>
+          </div>
 
-          <Col md={8}>
-            <ActorInfo
-              actor={actor}
+          <div>
+            <div className="actor-title-block">
+              <div className="actor-deco"></div>
+              <h1 className="actor-name">{actor.name}</h1>
+            </div>
+
+            <ActorBiography
+              biography={actor.biography}
               showFullBio={showFullBio}
               onToggleBio={() => setShowFullBio(!showFullBio)}
             />
@@ -235,8 +235,8 @@ export default function ActorProfile() {
               onPrev={() => setCarouselPosition(Math.max(0, carouselPosition - 1))}
               onNext={() => setCarouselPosition(Math.min(movies.length - 1, carouselPosition + 1))}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <SeeAlsoSection actors={similarActors} />
       </Container>
@@ -244,7 +244,7 @@ export default function ActorProfile() {
   );
 }
 
-// ==================== ACTOR PHOTO ====================
+// ==================== SUBCOMPONENTS ====================
 
 function ActorPhoto({ actor }: { actor: Actor }) {
   return (
@@ -262,38 +262,32 @@ function ActorPhoto({ actor }: { actor: Actor }) {
   );
 }
 
-// ==================== ACTOR INFO ====================
-
-function ActorInfo({
-  actor,
+function ActorBiography({
+  biography,
   showFullBio,
   onToggleBio,
 }: {
-  actor: Actor;
+  biography: string;
   showFullBio: boolean;
   onToggleBio: () => void;
 }) {
-  // Limiter la bio à 10 lignes (environ 600 caractères)
   const maxLength = 1000;
-  const needsReadMore = actor.biography && actor.biography.length > maxLength;
+  const needsReadMore = biography && biography.length > maxLength;
+
   const displayBio =
-    showFullBio || !needsReadMore
-      ? actor.biography
-      : actor.biography?.substring(0, maxLength) + "...";
+    showFullBio || !needsReadMore ? biography : biography.substring(0, maxLength) + "...";
 
   return (
     <div className="actor-info">
-      <h1 className="actor-name">{actor.name}</h1>
-
-      {actor.biography ? (
-        <div>
+      {biography ? (
+        <>
           <p className="actor-biography">{displayBio}</p>
           {needsReadMore && (
             <button className="read-more-button" onClick={onToggleBio}>
               {showFullBio ? "Show Less" : "Read More"}
             </button>
           )}
-        </div>
+        </>
       ) : (
         <p className="actor-biography">No biography available.</p>
       )}
@@ -320,6 +314,10 @@ function PersonalInformation({
 
   return (
     <div className="personal-info mt-4">
+      {/* ⭐ Bottom decoration corners */}
+      <div className="corner-bl"></div>
+      <div className="corner-br"></div>
+
       <h3 className="personal-info-title">Personal Information</h3>
 
       <InfoItem label="Famous For">{actor.known_for_department || "Acting"}</InfoItem>
@@ -370,7 +368,7 @@ function StarRating({ percentage }: { percentage: number }) {
   );
 }
 
-// ==================== FILMOGRAPHY SECTION ====================
+// ==================== FILMOGRAPHY ====================
 
 function FilmographySection({
   movies,
@@ -490,10 +488,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
           filter: "blur(3px)",
         };
       default:
-        return {
-          ...baseStyle,
-          opacity: 0,
-        };
+        return baseStyle;
     }
   };
 
@@ -516,7 +511,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
   );
 }
 
-// ==================== SEE ALSO SECTION ====================
+// ==================== SEE ALSO ====================
 
 function SeeAlsoSection({ actors }: { actors: SimilarActor[] }) {
   if (actors.length === 0) return null;
@@ -562,18 +557,8 @@ function ActorSkeleton() {
   return (
     <div className="actor-page">
       <Container className="py-5">
-        <Row>
-          <Col md={4}>
-            <div className="skeleton skeleton-photo mb-4" />
-            <div className="skeleton skeleton-info" />
-          </Col>
-          <Col md={8}>
-            <div className="skeleton skeleton-title mb-3" />
-            <div className="skeleton skeleton-bio mb-2" />
-            <div className="skeleton skeleton-bio mb-2" />
-            <div className="skeleton skeleton-bio" />
-          </Col>
-        </Row>
+        <div className="skeleton skeleton-photo mb-4" />
+        <div className="skeleton skeleton-info" />
       </Container>
     </div>
   );
