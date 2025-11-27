@@ -402,6 +402,9 @@ textarea:focus::placeholder {
 }
 
 .pagination-button {
+    position: relative;
+    overflow: hidden;
+
     padding: 0.5rem 1.25rem;
     background: transparent;
     color: #FFF0C4;
@@ -409,12 +412,31 @@ textarea:focus::placeholder {
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: all 0.2s;
+
+    transition: all 0.2s ease;
 }
 
-.pagination-button:hover:not(:disabled) {
-    background: #FFF0C4;
-    color: #150804;
+.pagination-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 240, 196, 0.55),
+            transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+}
+
+.pagination-button:not(:disabled):hover::after {
+    left: 130%;
+}
+
+.pagination-button:active {
+    transform: scale(0.93);
 }
 
 .pagination-button:disabled {

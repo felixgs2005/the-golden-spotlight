@@ -595,21 +595,24 @@ function Pagination({
 }) {
   return (
     <div className="pagination mt-4">
+      {" "}
       <button
         className="pagination-button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
       >
-        Prev
-      </button>
-      <div className="pagination-current">{currentPage}</div>
+        {" "}
+        Prev{" "}
+      </button>{" "}
+      <div className="pagination-current">{currentPage}</div>{" "}
       <button
         className="pagination-button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
       >
-        Next
-      </button>
+        {" "}
+        Next{" "}
+      </button>{" "}
     </div>
   );
 }
