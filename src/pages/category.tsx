@@ -1,49 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../styles/category.css";
+import { discoverMovies, searchMulti, getPersonMovieCredits, type MovieCard } from "../api/tmdb";
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const TMDB_BASE = "https://api.themoviedb.org/3";
-const IMAGE_BASE = "https://image.tmdb.org/t/p";
-const DEFAULT_LANGUAGE = "en-US";
 const RESULTS_PER_PAGE = 16;
-
-type MovieCard = {
-  id: number;
-  title: string;
-  posterUrl?: string;
-  year?: string;
-};
 
 type State =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; error: string }
   | { status: "success"; movies: MovieCard[]; totalPages: number; page: number; query?: string };
-
-function posterUrlFromPath(path?: string | null, size: "w342" | "w500" = "w342") {
-  return path ? `${IMAGE_BASE}/${size}${path}` : undefined;
-}
-
-function mapDiscoverResult(item: any): MovieCard {
-  return {
-    id: item.id,
-    title: item.title ?? item.name ?? "Untitled",
-    posterUrl: posterUrlFromPath(item.poster_path),
-    year: item.release_date ? item.release_date.slice(0, 4) : "",
-  };
-}
-
-function mapCreditToMovie(item: any): MovieCard {
-  return {
-    id: item.id,
-    title: item.title ?? item.original_title ?? item.name ?? "Untitled",
-    posterUrl: posterUrlFromPath(item.poster_path),
-    year: item.release_date ? item.release_date.slice(0, 4) : "",
-  };
-}
 
 // ==================== GENRES ====================
 
@@ -82,47 +49,6 @@ const SORT_OPTIONS: { label: string; value: string }[] = [
   { label: "Release Dates + / -", value: "release_date.desc" },
 ];
 
-// ==================== API CALLS ====================
-
-async function discoverMovies(params: Record<string, any>) {
-  const resp = await axios.get(`${TMDB_BASE}/discover/movie`, {
-    params: {
-      api_key: TMDB_API_KEY,
-      language: DEFAULT_LANGUAGE,
-      include_adult: false,
-      ...params,
-    },
-  });
-  return resp.data;
-}
-
-async function getPopularMovies(page = 1) {
-  const resp = await axios.get(`${TMDB_BASE}/movie/popular`, {
-    params: { api_key: TMDB_API_KEY, language: DEFAULT_LANGUAGE, page },
-  });
-  return resp.data;
-}
-
-async function searchMulti(query: string, page = 1) {
-  const resp = await axios.get(`${TMDB_BASE}/search/multi`, {
-    params: {
-      api_key: TMDB_API_KEY,
-      language: DEFAULT_LANGUAGE,
-      query,
-      page,
-      include_adult: false,
-    },
-  });
-  return resp.data;
-}
-
-async function getPersonMovieCredits(personId: number) {
-  const resp = await axios.get(`${TMDB_BASE}/person/${personId}/movie_credits`, {
-    params: { api_key: TMDB_API_KEY, language: DEFAULT_LANGUAGE },
-  });
-  return resp.data;
-}
-
 // ==================== MAIN COMPONENT ====================
 
 export default function Category() {
@@ -155,20 +81,27 @@ export default function Category() {
     async function loadDefault() {
       setState({ status: "loading" });
       try {
-        const data = await getPopularMovies(page);
+        const { movies, totalPages } = await discoverMovies({
+          sort_by: "popularity.desc",
+          page,
+        });
+
         if (!mounted) return;
-        const movies: MovieCard[] = (data.results ?? [])
-          .slice(0, RESULTS_PER_PAGE)
-          .map(mapDiscoverResult);
-        const totalPages = Math.ceil((data.total_results ?? movies.length) / RESULTS_PER_PAGE);
-        setState({ status: "success", movies, totalPages, page });
+
+        const limitedMovies = movies.slice(0, RESULTS_PER_PAGE);
+        setState({
+          status: "success",
+          movies: limitedMovies,
+          totalPages,
+          page,
+        });
       } catch (e) {
         if (!mounted) return;
         setState({ status: "error", error: String(e) });
       }
     }
 
-    // Si on a un terme de recherche, on ne fait RIEN ici
+    // Si on a un terme de recherche, on ne fait rien ici
     if (searchTerm) {
       return;
     }
@@ -185,27 +118,25 @@ export default function Category() {
       fetchDiscover();
     }
 
+    async function fetchDiscover() {
+      setState({ status: "loading" });
+      try {
+        const { movies, totalPages } = await discoverMovies(discoverParams);
+        if (!mounted) return;
+        setState({ status: "success", movies, totalPages, page });
+      } catch (e) {
+        if (!mounted) return;
+        setState({ status: "error", error: String(e) });
+      }
+    }
+
     return () => {
       mounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm, selectedGenres, dateFrom, dateTo, sortBy]);
 
-  // ==================== FONCTION FETCH DISCOVER ====================
-
-  async function fetchDiscover() {
-    setState({ status: "loading" });
-    try {
-      const data = await discoverMovies({ ...discoverParams });
-      const movies: MovieCard[] = (data.results ?? []).map(mapDiscoverResult);
-      const totalPages = data.total_pages ?? 1;
-      setState({ status: "success", movies, totalPages, page });
-    } catch (e) {
-      setState({ status: "error", error: String(e) });
-    }
-  }
-
-  // ==================== FONCTION SEARCH ====================
+  // ==================== SEARCH FUNCTION ====================
 
   async function handleSearchSubmit(e?: React.FormEvent) {
     if (e) {
@@ -217,39 +148,26 @@ export default function Category() {
     setPage(1);
 
     if (!q) {
-      // Si la recherche est vide, on revient au mode découverte
       setSearchTerm(undefined);
       return;
     }
 
-    // Important : on met à jour searchTerm pour bloquer le useEffect
     setSearchTerm(q);
-
     setState({ status: "loading" });
 
     try {
-      const data = await searchMulti(q, 1);
-      const results: any[] = data.results ?? [];
+      const { movies: searchResults, personId } = await searchMulti(q, 1);
 
-      // Séparer les films et personnes
-      let movieResults = results.filter((r) => r.media_type === "movie").map(mapDiscoverResult);
-
-      const personResult = results.find((r) => r.media_type === "person");
-
-      // Fonction pour scorer la pertinence d'un film
+      // Fonction pour scorer la pertinence
       const scoreMovie = (movie: MovieCard, searchQuery: string) => {
         const title = (movie.title || "").toLowerCase();
         const search = searchQuery.toLowerCase();
         let score = 0;
 
-        // Correspondance exacte = score max
         if (title === search) score += 1000;
-        // Commence par le terme recherché
         else if (title.startsWith(search)) score += 500;
-        // Contient le terme recherché
         else if (title.includes(search)) score += 100;
 
-        // Bonus pour les films récents (priorité aux nouveaux)
         const year = parseInt(movie.year || "0");
         if (year >= 2020) score += 50;
         else if (year >= 2010) score += 30;
@@ -258,32 +176,28 @@ export default function Category() {
         return score;
       };
 
-      // Trier les films par pertinence
-      movieResults = movieResults.sort((a, b) => {
+      // Trier par pertinence
+      const sortedMovies = searchResults.sort((a, b) => {
         return scoreMovie(b, q) - scoreMovie(a, q);
       });
 
-      // Si on a trouvé des films pertinents, on les affiche
-      if (movieResults.length > 0) {
-        const movies: MovieCard[] = movieResults.slice(0, RESULTS_PER_PAGE);
-        const totalPages = Math.ceil(movieResults.length / RESULTS_PER_PAGE);
-        setState({ status: "success", movies, totalPages, page: 1, query: q });
+      // Si on a des films, les afficher
+      if (sortedMovies.length > 0) {
+        const movies = sortedMovies.slice(0, RESULTS_PER_PAGE);
+        setState({
+          status: "success",
+          movies,
+          totalPages: Math.ceil(sortedMovies.length / RESULTS_PER_PAGE),
+          page: 1,
+          query: q,
+        });
         return;
       }
 
-      // Sinon, si c'est une personne, on affiche ses films
-      if (personResult) {
-        const credits = await getPersonMovieCredits(personResult.id);
-        const creditsMovies = (credits.cast ?? []).map(mapCreditToMovie).sort((a: any, b: any) => {
-          const yearA = parseInt(a.year || "0");
-          const yearB = parseInt(b.year || "0");
-          return yearB - yearA;
-        });
-
-        const unique = Array.from(
-          new Map(creditsMovies.map((m) => [m.id, m])).values()
-        ) as MovieCard[];
-        const movies = unique.slice(0, RESULTS_PER_PAGE);
+      // Sinon, si c'est une personne, afficher ses films
+      if (personId) {
+        const personMovies = await getPersonMovieCredits(personId);
+        const movies = personMovies.slice(0, RESULTS_PER_PAGE);
         setState({
           status: "success",
           movies,
@@ -293,7 +207,7 @@ export default function Category() {
         return;
       }
 
-      // Aucun résultat trouvé
+      // Aucun résultat
       setState({
         status: "success",
         movies: [],
@@ -384,7 +298,7 @@ export default function Category() {
   );
 }
 
-// ==================== SEARCH BAR ====================
+// ==================== SUBCOMPONENTS ====================
 
 function SearchBar({
   query,
@@ -412,8 +326,6 @@ function SearchBar({
     </form>
   );
 }
-
-// ==================== SORT PANEL ====================
 
 function SortPanel({
   isOpen,
@@ -449,8 +361,6 @@ function SortPanel({
     </div>
   );
 }
-
-// ==================== FILTER PANEL ====================
 
 function FilterPanel({
   isOpen,
@@ -524,8 +434,6 @@ function FilterPanel({
   );
 }
 
-// ==================== RESULTS HEADER ====================
-
 function ResultsHeader({ query, count }: { query?: string; count: number }) {
   return (
     <div className="results-header mb-3">
@@ -543,8 +451,6 @@ function ResultsHeader({ query, count }: { query?: string; count: number }) {
   );
 }
 
-// ==================== POSTERS GRID ====================
-
 function PostersGrid({ movies }: { movies: MovieCard[] }) {
   if (!movies || movies.length === 0) {
     return <div className="no-results">No results</div>;
@@ -554,14 +460,14 @@ function PostersGrid({ movies }: { movies: MovieCard[] }) {
     <Row className="g-3">
       {movies.map((m) => (
         <Col key={m.id} xs={6} md={3}>
-          <MovieCard movie={m} />
+          <MovieCardComponent movie={m} />
         </Col>
       ))}
     </Row>
   );
 }
 
-function MovieCard({ movie }: { movie: MovieCard }) {
+function MovieCardComponent({ movie }: { movie: MovieCard }) {
   return (
     <Link to={`/film/${movie.id}`} className="movie-card">
       <div className="movie-card-image">
@@ -582,8 +488,6 @@ function MovieCard({ movie }: { movie: MovieCard }) {
   );
 }
 
-// ==================== PAGINATION ====================
-
 function Pagination({
   currentPage,
   totalPages,
@@ -595,29 +499,24 @@ function Pagination({
 }) {
   return (
     <div className="pagination mt-4">
-      {" "}
       <button
         className="pagination-button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
       >
-        {" "}
-        Prev{" "}
-      </button>{" "}
-      <div className="pagination-current">{currentPage}</div>{" "}
+        Prev
+      </button>
+      <div className="pagination-current">{currentPage}</div>
       <button
         className="pagination-button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
       >
-        {" "}
-        Next{" "}
-      </button>{" "}
+        Next
+      </button>
     </div>
   );
 }
-
-// ==================== SKELETON ====================
 
 function CategorySkeleton() {
   return (

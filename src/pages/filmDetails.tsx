@@ -365,30 +365,19 @@ function ActorsSection({ actors }: { actors: any[] }) {
 
 function ActorCard({ actor }: { actor: any }) {
   return (
-    <div className="actor-card p-3 border">
-      {actor.profileUrl ? (
-        <img
-          src={actor.profileUrl}
-          alt={actor.name}
-          className="img-fluid rounded-circle mb-2"
-          style={{ width: 100, height: 100, objectFit: "cover" }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 100,
-            height: 100,
-            borderRadius: "50%",
-            background: "#333",
-            marginBottom: 8,
-          }}
-        />
-      )}
-      <p className="name-actor text-light mb-1">{actor.name}</p>
-      <Link to={`/actor/${actor.id}`} className="actor-known-for text-decoration-none">
-        Known For →
-      </Link>
-    </div>
+    <Link to={`/actor/${actor.id}`} className="actor-card">
+      <div className="actor-photo-card-container p-3">
+        {actor.profileUrl ? (
+          <img src={actor.profileUrl} alt={actor.name} className="actor-photo-card" />
+        ) : (
+          <div className="actor-photo-placeholder">
+            <span>?</span>
+          </div>
+        )}
+      </div>
+      <p className="name-actor">{actor.name}</p>
+      <span className="actor-known-for">Known For →</span>
+    </Link>
   );
 }
 

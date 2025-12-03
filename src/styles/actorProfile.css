@@ -383,12 +383,18 @@
   border: 1px solid #FFF0C4;
   flex-shrink: 0;
   text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .similar-actor-card:hover {
   box-shadow: 0 12px 24px rgba(140, 16, 7, 0.5);
   background: linear-gradient(#0a0a0a 40%, #0a0a0a 80%, #8C1007 80%);
-  border-color: #f5d7b7;
+  border-color: #FFF0C4;
+}
+
+.similar-actor-card:hover img {
+  outline: 7px solid #8C1007;
+  outline-offset: 3px;
 }
 
 .similar-actor-photo {
@@ -405,7 +411,7 @@
 }
 
 .actor-view-profile {
-  color: #f5d7b7;
+  color: #FFF0C4;
   width: 100%;
   padding-top: 35px;
   text-align: center;
@@ -415,6 +421,7 @@
   opacity: 0;
   max-height: 0;
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .similar-actor-card:hover .actor-view-profile {

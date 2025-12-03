@@ -1,7 +1,23 @@
+/* ========== CONTAINER PRINCIPAL ========== */
+
+.home-wrapper {
+  background: #150804;
+  min-height: 100vh;
+}
+
 .home-container {
   width: 100%;
   max-width: 1920px;
   margin: 0 auto;
+}
+
+/* ========== HERO SECTION ========== */
+
+.section-hero {
+  background-image: url(../assets/images/Decoration/Background.svg);
+  padding: 30px 0;
+  position: relative;
+  display: block;
 }
 
 .img-hero {
@@ -10,13 +26,6 @@
   margin: auto;
   display: block;
   border: 1px solid #FFF0C4;
-}
-
-.section-hero {
-  background-image: url(../assets/images/Decoration/Background.svg);
-  padding: 30px 0;
-  position: relative;
-  display: block;
 }
 
 .play-button {
@@ -37,14 +46,240 @@
   text-transform: uppercase;
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-size: 20px;
-
   clip-path: polygon(10% 0%,
-      /* coin haut gauche coupé */
       100% 0%,
       100% 100%,
       10% 100%,
-      /* coin bas gauche coupé */
-      0% 50%
-      /* pointe gauche */
-    );
+      0% 50%);
+}
+
+.play-button:hover {
+  background-color: #8C1007;
+  color: #FFF0C4;
+}
+
+/* ========== SECTIONS GÉNÉRALES ========== */
+
+.home-section {
+  padding: 3rem 0;
+  position: relative;
+}
+
+.home-section-title {
+  font-size: 1.8rem;
+  color: #FFF0C4;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.section-deco {
+  width: 120px;
+  opacity: 0.9;
+  position: absolute;
+  top: 5px;
+}
+
+/* ========== CAROUSEL SCROLL (ANCIEN STYLE) ========== */
+
+.home-scroll-container {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+.home-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.home-scroll-container::-webkit-scrollbar-thumb {
+  background: #FFF0C4;
+  border-radius: 4px;
+}
+
+.home-film-card {
+  flex-shrink: 0;
+  width: 160px;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-film-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 20px rgba(140, 16, 7, 0.5);
+}
+
+.home-film-poster {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #FFF0C4;
+}
+
+/* ========== CAROUSEL AVEC FLÈCHES ========== */
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-container {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 1rem 0;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-arrow {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #FFF0C4;
+  color: #FFF0C4;
+  font-size: 2rem;
+  width: 45px;
+  height: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 10;
+  transition: background 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.carousel-arrow:hover {
+  background: rgba(255, 240, 196, 0.2);
+}
+
+.left-arrow {
+  left: -20px;
+}
+
+.right-arrow {
+  right: -20px;
+}
+
+/* ========== CAROUSEL 3D ========== */
+
+.carousel-3d-wrapper {
+  height: 35rem;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 2rem auto;
+}
+
+.carousel-3d-container {
+  height: 100%;
+  width: 80%;
+  position: relative;
+  overflow: visible;
+  perspective: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Gradient fade sur les côtés */
+.carousel-3d-fade {
+  height: 100%;
+  width: 102%;
+  position: absolute;
+  top: 0;
+  left: -1%;
+  pointer-events: none;
+  background: linear-gradient(to left,
+      #150804,
+      transparent 15%,
+      transparent 85%,
+      #150804);
+  z-index: 3;
+}
+
+/* Flèches du carousel 3D */
+.carousel-3d-arrow {
+  width: 10%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  color: #f5d7b7;
+  font-size: 32px;
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+.carousel-3d-arrow:hover {
+  transform: scale(1.2);
+}
+
+.carousel-3d-arrow:active {
+  transform: scale(1.1);
+}
+
+/* Titre sous la carte centrale */
+.carousel-3d-title {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  text-align: center;
+  color: #f5d7b7;
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+  .home-section-title {
+    font-size: 1.4rem;
+  }
+
+  .play-button {
+    left: 50%;
+    bottom: 30px;
+    font-size: 16px;
+    padding: 4px 20px;
+  }
+
+  .carousel-3d-wrapper {
+    height: 28rem;
+  }
+
+  .carousel-3d-arrow {
+    font-size: 24px;
+  }
+
+  .carousel-3d-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-3d-wrapper {
+    height: 24rem;
+  }
+
+  .play-button {
+    font-size: 14px;
+    padding: 4px 16px;
+    gap: 10px;
+  }
 }

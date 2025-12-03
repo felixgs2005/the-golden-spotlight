@@ -1,39 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import { Container } from "react-bootstrap";
 import "../styles/actorProfile.css";
-
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const TMDB_BASE = "https://api.themoviedb.org/3";
-const IMAGE_BASE = "https://image.tmdb.org/t/p";
-const DEFAULT_LANGUAGE = "en-US";
-
-type MovieCard = {
-  id: number;
-  title: string;
-  posterUrl?: string;
-  year?: string;
-};
-
-type Actor = {
-  id: number;
-  name: string;
-  biography: string;
-  birthday?: string;
-  deathday?: string;
-  place_of_birth?: string;
-  profile_path?: string;
-  known_for_department?: string;
-  gender?: number;
-  popularity?: number;
-};
-
-type SimilarActor = {
-  id: number;
-  name: string;
-  profile_path?: string;
-};
+import {
+  getActorProfile,
+  getActorMovies,
+  getSimilarActors,
+  buildImageUrl,
+  type ActorProfile as ActorProfileType,
+  type MovieCard,
+  type SimilarActor,
+} from "../api/tmdb";
 
 type State =
   | { status: "idle" }
@@ -41,24 +18,13 @@ type State =
   | { status: "error"; error: string }
   | {
       status: "success";
-      actor: Actor;
+      actor: ActorProfileType;
       movies: MovieCard[];
       totalCredits: number;
       similarActors: SimilarActor[];
     };
 
-function posterUrlFromPath(path?: string | null, size: "w342" | "w500" = "w342") {
-  return path ? `${IMAGE_BASE}/${size}${path}` : undefined;
-}
-
-function mapMovie(item: any): MovieCard {
-  return {
-    id: item.id,
-    title: item.title ?? item.name ?? "Untitled",
-    posterUrl: posterUrlFromPath(item.poster_path),
-    year: item.release_date ? item.release_date.slice(0, 4) : "",
-  };
-}
+// ==================== UTILITY FUNCTIONS ====================
 
 function formatDate(dateString?: string): string {
   if (!dateString) return "Unknown";
@@ -107,77 +73,27 @@ export default function ActorProfile() {
   const [carouselPosition, setCarouselPosition] = useState(3);
 
   useEffect(() => {
+    if (!id) return;
+
     let mounted = true;
 
     async function fetchActorData() {
       setState({ status: "loading" });
 
       try {
-        const [actorResp, creditsResp] = await Promise.all([
-          axios.get(`${TMDB_BASE}/person/${id}`, {
-            params: { api_key: TMDB_API_KEY, language: DEFAULT_LANGUAGE },
-          }),
-          axios.get(`${TMDB_BASE}/person/${id}/movie_credits`, {
-            params: { api_key: TMDB_API_KEY, language: DEFAULT_LANGUAGE },
-          }),
+        const [actor, movies, similarActors] = await Promise.all([
+          getActorProfile(id),
+          getActorMovies(id),
+          getSimilarActors(id),
         ]);
 
         if (!mounted) return;
 
-        const actor = actorResp.data;
-        const allMovies = creditsResp.data.cast ?? [];
-        const totalCredits = allMovies.length;
+        // Pour obtenir le nombre total de crédits, on doit faire une requête supplémentaire
+        // ou simplement utiliser une valeur approximative basée sur les films récupérés
+        const totalCredits = movies.length; // Approximation
 
-        const topMovies = allMovies
-          .map(mapMovie)
-          .filter((m: MovieCard) => m.posterUrl)
-          .sort((a: MovieCard, b: MovieCard) => Number(b.year) - Number(a.year))
-          .slice(0, 7);
-
-        const coStarsMap = new Map<
-          number,
-          { id: number; name: string; profile_path: string | null; count: number }
-        >();
-
-        const movieIds = allMovies.slice(0, 10).map((m: any) => m.id);
-
-        const castPromises = movieIds.map(async (movieId: number) => {
-          try {
-            const response = await axios.get(`${TMDB_BASE}/movie/${movieId}/credits`, {
-              params: { api_key: TMDB_API_KEY },
-            });
-            return response.data.cast || [];
-          } catch {
-            return [];
-          }
-        });
-
-        const allCasts = await Promise.all(castPromises);
-
-        allCasts.forEach((cast: any[]) => {
-          cast.slice(0, 10).forEach((castMember: any) => {
-            if (castMember.id !== actor.id) {
-              const existing = coStarsMap.get(castMember.id);
-              if (existing) {
-                existing.count++;
-              } else {
-                coStarsMap.set(castMember.id, {
-                  id: castMember.id,
-                  name: castMember.name,
-                  profile_path: castMember.profile_path,
-                  count: 1,
-                });
-              }
-            }
-          });
-        });
-
-        const similarActors = Array.from(coStarsMap.values())
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 12)
-          .map(({ id, name, profile_path }) => ({ id, name, profile_path }));
-
-        setState({ status: "success", actor, movies: topMovies, totalCredits, similarActors });
+        setState({ status: "success", actor, movies, totalCredits, similarActors });
       } catch (e) {
         if (!mounted) return;
         setState({ status: "error", error: String(e) });
@@ -246,12 +162,12 @@ export default function ActorProfile() {
 
 // ==================== SUBCOMPONENTS ====================
 
-function ActorPhoto({ actor }: { actor: Actor }) {
+function ActorPhoto({ actor }: { actor: ActorProfileType }) {
   return (
     <div className="actor-photo-container">
       {actor.profile_path ? (
         <img
-          src={posterUrlFromPath(actor.profile_path, "w500")}
+          src={buildImageUrl(actor.profile_path, "w500")}
           alt={actor.name}
           className="actor-photo"
         />
@@ -295,14 +211,12 @@ function ActorBiography({
   );
 }
 
-// ==================== PERSONAL INFORMATION ====================
-
 function PersonalInformation({
   actor,
   age,
   totalCredits,
 }: {
-  actor: Actor;
+  actor: ActorProfileType;
   age: number | null;
   totalCredits: number;
 }) {
@@ -314,7 +228,6 @@ function PersonalInformation({
 
   return (
     <div className="personal-info mt-4">
-      {/* ⭐ Bottom decoration corners */}
       <div className="corner-bl"></div>
       <div className="corner-br"></div>
 
@@ -367,8 +280,6 @@ function StarRating({ percentage }: { percentage: number }) {
     </div>
   );
 }
-
-// ==================== FILMOGRAPHY ====================
 
 function FilmographySection({
   movies,
@@ -511,19 +422,19 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
   );
 }
 
-// ==================== SEE ALSO ====================
-
 function SeeAlsoSection({ actors }: { actors: SimilarActor[] }) {
   if (actors.length === 0) return null;
 
   return (
     <section className="see-also-section py-5">
-      <h2 className="section-title mb-4">Worked With</h2>
+      <div className="container">
+        <h2 className="section-title mb-4">Worked With</h2>
 
-      <div className="similar-actors-scroll">
-        {actors.map((actor) => (
-          <SimilarActorCard key={actor.id} actor={actor} />
-        ))}
+        <div className="similar-actors-scroll">
+          {actors.map((actor) => (
+            <SimilarActorCard key={actor.id} actor={actor} />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -532,10 +443,10 @@ function SeeAlsoSection({ actors }: { actors: SimilarActor[] }) {
 function SimilarActorCard({ actor }: { actor: SimilarActor }) {
   return (
     <Link to={`/actor/${actor.id}`} className="similar-actor-card">
-      <div className="similar-actor-photo-container">
+      <div className="similar-actor-photo-container p-3">
         {actor.profile_path ? (
           <img
-            src={posterUrlFromPath(actor.profile_path)}
+            src={buildImageUrl(actor.profile_path)}
             alt={actor.name}
             className="similar-actor-photo"
           />
@@ -550,8 +461,6 @@ function SimilarActorCard({ actor }: { actor: SimilarActor }) {
     </Link>
   );
 }
-
-// ==================== SKELETON ====================
 
 function ActorSkeleton() {
   return (
