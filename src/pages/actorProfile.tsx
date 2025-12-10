@@ -52,9 +52,7 @@ function calculateAge(birthday?: string, deathday?: string): number | null {
   const end = deathday ? new Date(deathday) : new Date();
   let age = end.getFullYear() - birth.getFullYear();
   const monthDiff = end.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && end.getDate() < birth.getDate())) {
-    age--;
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && end.getDate() < birth.getDate())) age--;
   return age;
 }
 
@@ -89,9 +87,7 @@ export default function ActorProfile() {
 
         if (!mounted) return;
 
-        // Pour obtenir le nombre total de crédits, on doit faire une requête supplémentaire
-        // ou simplement utiliser une valeur approximative basée sur les films récupérés
-        const totalCredits = movies.length; // Approximation
+        const totalCredits = movies.length;
 
         setState({ status: "success", actor, movies, totalCredits, similarActors });
       } catch (e) {
@@ -101,16 +97,12 @@ export default function ActorProfile() {
     }
 
     fetchActorData();
-
     return () => {
       mounted = false;
     };
   }, [id]);
 
-  if (state.status === "loading" || state.status === "idle") {
-    return <ActorSkeleton />;
-  }
-
+  if (state.status === "loading" || state.status === "idle") return <ActorSkeleton />;
   if (state.status === "error") {
     return (
       <div className="actor-page">
@@ -127,13 +119,11 @@ export default function ActorProfile() {
   return (
     <div className="actor-page">
       <Container className="py-5">
-        <div className="actor-hero">
-          <div>
-            <ActorPhoto actor={actor} />
-            <PersonalInformation actor={actor} age={age} totalCredits={totalCredits} />
-          </div>
+        {/* ==================== ROW 1 — PHOTO + BIO ==================== */}
+        <div className="actor-top">
+          <ActorPhoto actor={actor} />
 
-          <div>
+          <div className="actor-top-text">
             <div className="actor-title-block">
               <div className="actor-deco"></div>
               <h1 className="actor-name">{actor.name}</h1>
@@ -144,14 +134,19 @@ export default function ActorProfile() {
               showFullBio={showFullBio}
               onToggleBio={() => setShowFullBio(!showFullBio)}
             />
-
-            <FilmographySection
-              movies={movies}
-              carouselPosition={carouselPosition}
-              onPrev={() => setCarouselPosition(Math.max(0, carouselPosition - 1))}
-              onNext={() => setCarouselPosition(Math.min(movies.length - 1, carouselPosition + 1))}
-            />
           </div>
+        </div>
+
+        {/* ==================== ROW 2 — PERSONAL INFO + CAROUSEL ==================== */}
+        <div className="actor-bottom">
+          <PersonalInformation actor={actor} age={age} totalCredits={totalCredits} />
+
+          <FilmographySection
+            movies={movies}
+            carouselPosition={carouselPosition}
+            onPrev={() => setCarouselPosition(Math.max(0, carouselPosition - 1))}
+            onNext={() => setCarouselPosition(Math.min(movies.length - 1, carouselPosition + 1))}
+          />
         </div>
 
         <SeeAlsoSection actors={similarActors} />
@@ -233,30 +228,42 @@ function PersonalInformation({
 
       <h3 className="personal-info-title">Personal Information</h3>
 
-      <InfoItem label="Famous For">{actor.known_for_department || "Acting"}</InfoItem>
+      <div className="personal-info-section">
+        <InfoItem label="Famous For">{actor.known_for_department || "Acting"}</InfoItem>
+      </div>
 
-      <InfoItem label="Known Credits">{totalCredits}</InfoItem>
+      <div className="personal-info-section">
+        <InfoItem label="Known Credits">{totalCredits}</InfoItem>
+      </div>
 
-      <InfoItem label="Gender">{getGenderText(actor.gender)}</InfoItem>
+      <div className="personal-info-section">
+        <InfoItem label="Gender">{getGenderText(actor.gender)}</InfoItem>
+      </div>
 
-      <InfoItem label="Date of Birth">
-        {formatDate(actor.birthday)}
-        {age && !actor.deathday && <span className="age-text"> ({age} years old)</span>}
-      </InfoItem>
+      <div className="personal-info-section">
+        <InfoItem label="Date of Birth">
+          {formatDate(actor.birthday)}
+          {age && !actor.deathday && <span className="age-text"> ({age} years old)</span>}
+        </InfoItem>
+      </div>
 
       {actor.deathday && (
-        <InfoItem label="Date of Death">
-          {formatDate(actor.deathday)}
-          {age && <span className="age-text"> (aged {age})</span>}
-        </InfoItem>
+        <div className="personal-info-section">
+          <InfoItem label="Date of Death">
+            {formatDate(actor.deathday)}
+            {age && <span className="age-text"> (aged {age})</span>}
+          </InfoItem>
+        </div>
       )}
 
-      <InfoItem label="Content Score">
-        <div className="content-score">
-          <StarRating percentage={popularityScore} />
-          <span className="score-value">{popularityScore}%</span>
-        </div>
-      </InfoItem>
+      <div className="personal-info-section content-score-section">
+        <InfoItem label="Content Score">
+          <div className="content-score">
+            <StarRating percentage={popularityScore} />
+            <span className="score-value">{popularityScore}%</span>
+          </div>
+        </InfoItem>
+      </div>
     </div>
   );
 }
@@ -358,7 +365,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
           ...baseStyle,
           left: "20%",
           zIndex: 1,
-          transform: "translate(-50%, 0) scale(0.8)",
+          transform: "scale(0.8)",
           opacity: 1,
           filter: "blur(3px)",
         };
@@ -367,25 +374,18 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
           ...baseStyle,
           left: "35%",
           zIndex: 2,
-          transform: "translate(-50%, 0) scale(0.9)",
+          transform: "scale(0.9)",
           opacity: 1,
           filter: "blur(1px)",
         };
       case 3:
-        return {
-          ...baseStyle,
-          left: "50%",
-          zIndex: 4,
-          transform: "translate(-50%, 0) scale(1)",
-          opacity: 1,
-          filter: "blur(0px)",
-        };
+        return { ...baseStyle, left: "50%", zIndex: 4, transform: "scale(1)", opacity: 1 };
       case 4:
         return {
           ...baseStyle,
           left: "65%",
           zIndex: 2,
-          transform: "translate(-50%, 0) scale(0.9)",
+          transform: "scale(0.9)",
           opacity: 1,
           filter: "blur(1px)",
         };
@@ -394,7 +394,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
           ...baseStyle,
           left: "80%",
           zIndex: 1,
-          transform: "translate(-50%, 0) scale(0.8)",
+          transform: "scale(0.8)",
           opacity: 1,
           filter: "blur(3px)",
         };
@@ -412,7 +412,6 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
       ) : (
         <div className="film-card-placeholder">No poster</div>
       )}
-
       {isCenter && (
         <div className="film-card-overlay">
           <div className="film-card-title">{movie.title}</div>
