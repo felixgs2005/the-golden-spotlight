@@ -32,7 +32,7 @@ function Home3DCard({ movie, position }: { movie: MovieCard; position: number })
     left: "50%",
     width: "14rem",
     height: "24rem",
-    borderRadius: "25px",
+    border: "1px solid #FFF0C4",
     transition: "0.5s",
     opacity: 0,
   };
@@ -92,7 +92,7 @@ function Home3DCard({ movie, position }: { movie: MovieCard; position: number })
         <img
           src={movie.posterUrl}
           alt={movie.title}
-          style={{ width: "100%", height: "100%", borderRadius: "25px", objectFit: "cover" }}
+          style={{ width: "100%", height: "100%", border: "1px solid #FFF0C4", objectFit: "cover" }}
           onError={(e) => {
             console.error("Failed to load image:", movie.posterUrl);
             e.currentTarget.style.display = "none";

@@ -532,6 +532,7 @@ function SimilarSection({ movies }: { movies: Movie[] }) {
 
 function SimilarMovieCard({ movie, position }: { movie: Movie; position: number }) {
   const posterUrl = getMoviePosterUrl(movie);
+  const [isHovered, setIsHovered] = useState(false);
 
   const getPositionStyles = () => {
     const baseStyle = {
@@ -541,13 +542,13 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
       maxHeight: "400px",
       width: "14rem",
       minWidth: "270px",
-      borderRadius: "25px",
+      border: "3px solid #FFF0C4",
       zIndex: 0,
       opacity: 0,
       transform: "translate(-50%, 0) rotateY(0deg) scale(1,1)",
       transformStyle: "preserve-3d" as const,
       transition:
-        "transform 0.5s ease-in-out, opacity 0.5s ease-in-out, left 0.5s ease-in-out, z-index 0s 0.25s ease-in-out, box-shadow 0.5s ease-in-out, filter 0.5s ease-in-out",
+        "transform 0.5s ease-in-out, opacity 0.5s ease-in-out, left 0.5s ease-in-out, z-index 0s 0.25s ease-in-out, border-color 0.3s ease-in-out",
       overflow: "hidden",
     };
 
@@ -559,8 +560,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 1,
           transform: "translate(-50%, 0) rotateY(-2deg) scale(0.8, 0.8)",
           opacity: 1,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1)",
-          filter: "blur(5px)",
         };
       case 2:
         return {
@@ -569,8 +568,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 2,
           transform: "translate(-50%, 0) rotateY(-1deg) scale(0.9, 0.9)",
           opacity: 1,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3)",
-          filter: "blur(2px)",
         };
       case 3:
         return {
@@ -579,8 +576,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 4,
           transform: "translate(-50%, 0) rotateY(0deg) scale(1, 1)",
           opacity: 1,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5)",
-          filter: "blur(0px)",
           cursor: "pointer",
         };
       case 4:
@@ -590,8 +585,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 2,
           transform: "translate(-50%, 0) rotateY(1deg) scale(0.9, 0.9)",
           opacity: 1,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3)",
-          filter: "blur(2px)",
         };
       case 5:
         return {
@@ -600,8 +593,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 1,
           transform: "translate(-50%, 0) rotateY(2deg) scale(0.8, 0.8)",
           opacity: 1,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1)",
-          filter: "blur(5px)",
         };
       default:
         return {
@@ -610,7 +601,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           zIndex: 0,
           transform: "translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7)",
           opacity: 0,
-          boxShadow: "0px 0.4rem 1.6rem rgba(0, 0, 0, 0)",
         };
     }
   };
@@ -624,19 +614,10 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
       style={{
         ...getPositionStyles(),
         pointerEvents: isCenter ? "auto" : "none",
+        borderColor: isCenter && isHovered ? "#8C1007" : "#FFF0C4",
       }}
-      onMouseEnter={(e) => {
-        if (isCenter) {
-          e.currentTarget.style.boxShadow = "0px 0rem 1.8rem rgba(0, 0, 0, 0.7)";
-          e.currentTarget.style.transform = "translate(-50%, 0) rotateY(0deg) scale(1.05, 1.05)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (isCenter) {
-          e.currentTarget.style.boxShadow = "0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5)";
-          e.currentTarget.style.transform = "translate(-50%, 0) rotateY(0deg) scale(1, 1)";
-        }
-      }}
+      onMouseEnter={() => isCenter && setIsHovered(true)}
+      onMouseLeave={() => isCenter && setIsHovered(false)}
     >
       {posterUrl ? (
         <img
@@ -646,7 +627,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            borderRadius: "25px",
           }}
         />
       ) : (
@@ -655,7 +635,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
             width: "100%",
             height: "100%",
             background: "#333",
-            borderRadius: "25px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -665,22 +644,30 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
         </div>
       )}
 
-      {isCenter && (
+      {/* Overlay noir au hover */}
+      {isCenter && isHovered && (
         <div
           style={{
             position: "absolute",
-            bottom: "4%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "90%",
-            textAlign: "center",
-            color: "#f5d7b7",
-            fontWeight: "600",
-            fontSize: "16px",
-            textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            padding: "1rem",
           }}
         >
-          {getMovieTitle(movie)}
+          <div
+            style={{
+              color: "#FFF0C4",
+              fontWeight: "600",
+              fontSize: "16px",
+              textAlign: "center",
+              textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+            }}
+          >
+            {getMovieTitle(movie)}
+          </div>
         </div>
       )}
     </Link>

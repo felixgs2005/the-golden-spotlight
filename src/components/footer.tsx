@@ -30,7 +30,7 @@ const Footer = () => {
         {/* Middle section: links */}
         <div className="footer-middle">
           <a href="/">Home</a>
-          <a href="/categories">Categories</a>
+          <a href="/category">Categories</a>
           <a href="/about">About</a>
         </div>
 

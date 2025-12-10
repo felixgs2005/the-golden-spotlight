@@ -231,6 +231,10 @@
 
 /* Titre sous la carte centrale */
 .carousel-3d-title {
+  display: none;
+}
+
+.carousel-3d-title {
   position: absolute;
   bottom: 5%;
   left: 50%;
@@ -244,6 +248,7 @@
   pointer-events: none;
   z-index: 5;
 }
+
 
 /* ========== RESPONSIVE ========== */
 
