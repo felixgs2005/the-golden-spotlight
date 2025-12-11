@@ -27,95 +27,79 @@ type HomeState =
 // ========================== 3D CAROUSEL COMPONENT ==========================
 
 function Home3DCard({ movie, position }: { movie: MovieCard; position: number }) {
-  const base: any = {
+  const [hover, setHover] = useState(false);
+
+  const base: React.CSSProperties = {
     position: "absolute",
     left: "50%",
     width: "14rem",
     height: "24rem",
-    border: "1px solid #FFF0C4",
-    transition: "0.5s",
+    border: "3px solid #FFF0C4",
+    transition: "0.45s ease",
     opacity: 0,
+    overflow: "hidden",
   };
 
   const styleMap: Record<number, React.CSSProperties> = {
     1: {
       ...base,
-      left: "20%",
+      left: "50%",
+      transform: "translateX(-50%) translateX(-280px) scale(0.85) rotateY(-2deg)",
       opacity: 1,
-      transform: "scale(0.8) rotateY(-2deg)",
       zIndex: 1,
-      filter: "blur(5px)",
     },
     2: {
       ...base,
-      left: "35%",
-      opacity: 1,
-      transform: "scale(0.9) rotateY(-1deg)",
-      zIndex: 2,
-      filter: "blur(2px)",
-    },
-    3: {
-      ...base,
       left: "50%",
+      transform: "translateX(-50%) translateX(-140px) scale(0.92) rotateY(-1deg)",
       opacity: 1,
-      transform: "scale(1)",
-      zIndex: 4,
+      zIndex: 2,
     },
+    3: { ...base, left: "50%", transform: "translateX(-50%) scale(1)", opacity: 1, zIndex: 4 }, // carte centrale
     4: {
       ...base,
-      left: "65%",
+      left: "50%",
+      transform: "translateX(-50%) translateX(140px) scale(0.92) rotateY(1deg)",
       opacity: 1,
-      transform: "scale(0.9) rotateY(1deg)",
       zIndex: 2,
-      filter: "blur(2px)",
     },
     5: {
       ...base,
-      left: "80%",
+      left: "50%",
+      transform: "translateX(-50%) translateX(280px) scale(0.85) rotateY(2deg)",
       opacity: 1,
-      transform: "scale(0.8) rotateY(2deg)",
       zIndex: 1,
-      filter: "blur(5px)",
     },
-    0: {
-      ...base,
-      opacity: 0,
-      transform: "scale(0.6)",
-    },
+    0: { ...base, opacity: 0, transform: "scale(0.6)" },
   };
 
-  const style = styleMap[position];
+  const isCenter = position === 3;
 
   return (
-    <Link to={`/film/${movie.id}`} style={style}>
-      {movie.posterUrl ? (
-        <img
-          src={movie.posterUrl}
-          alt={movie.title}
-          style={{ width: "100%", height: "100%", border: "1px solid #FFF0C4", objectFit: "cover" }}
-          onError={(e) => {
-            console.error("Failed to load image:", movie.posterUrl);
-            e.currentTarget.style.display = "none";
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "25px",
-            background: "#333",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#666",
-          }}
-        >
-          No Poster
+    <Link
+      to={`/film/${movie.id}`}
+      style={{
+        ...styleMap[position],
+        pointerEvents: isCenter ? "auto" : "none",
+        borderColor: isCenter && hover ? "#8C1007" : "#FFF0C4",
+      }}
+      onMouseEnter={() => isCenter && setHover(true)}
+      onMouseLeave={() => isCenter && setHover(false)}
+    >
+      <img
+        src={movie.posterUrl}
+        alt={movie.title}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
+
+      {isCenter && (
+        <div className={`home-full-overlay ${hover ? "visible" : ""}`}>
+          <div className="home-overlay-text">
+            <div className="home-overlay-title">{movie.title}</div>
+            {movie.year && <div className="home-overlay-year">{movie.year}</div>}
+          </div>
         </div>
       )}
-
-      {position === 3 && <div className="carousel-3d-title">{movie.title}</div>}
     </Link>
   );
 }
@@ -236,18 +220,22 @@ export default function Home() {
 
   // ========================== HERO MOVIE ==========================
 
-  const heroMovie = {
+  // Utiliser le premier film populaire comme hero (le plus écouté du mois)
+  const heroMovie = popular[0] || {
     id: 820446,
     title: "Downton Abbey",
     posterUrl: downtownAbbey,
   };
+
+  // Utiliser le backdrop au lieu du poster pour le hero
+  const heroImageUrl = heroMovie.backdropUrl || heroMovie.posterUrl || downtownAbbey;
 
   return (
     <div className="home-wrapper">
       {/* HERO */}
       <div className="home-container">
         <div className="section-hero">
-          <img className="img-hero" src={heroMovie.posterUrl} alt={heroMovie.title} />
+          <img className="img-hero" src={heroImageUrl} alt={heroMovie.title} />
           <Link to={`/film/${heroMovie.id}`} className="play-button">
             <i className="fa fa-play"></i> Play
           </Link>

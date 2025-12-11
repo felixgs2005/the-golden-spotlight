@@ -15,6 +15,7 @@ export type MovieCard = {
   id: number;
   title: string;
   posterUrl?: string;
+  backdropUrl?: string;
   year?: string;
 };
 
@@ -37,6 +38,7 @@ function mapToMovieCard(item: any): MovieCard {
     id: item.id,
     title: item.title ?? item.name ?? "Untitled",
     posterUrl: buildImageUrl(item.poster_path),
+    backdropUrl: buildImageUrl(item.backdrop_path, "w780"),
     year: item.release_date ? item.release_date.slice(0, 4) : "",
   };
 }

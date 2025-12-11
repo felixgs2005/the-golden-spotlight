@@ -386,143 +386,62 @@ function ActorCard({ actor }: { actor: any }) {
 function SimilarSection({ movies }: { movies: Movie[] }) {
   const [positions, setPositions] = useState<number[]>([]);
 
+  // Initialisation identique à HomeCarousel3D
   useEffect(() => {
     if (movies.length === 0) return;
+
     const center = Math.floor(movies.length / 2);
-    const initial = movies.map((_, i) => {
-      if (i === center - 2) return 1;
-      if (i === center - 1) return 2;
-      if (i === center) return 3;
-      if (i === center + 1) return 4;
-      if (i === center + 2) return 5;
-      return 0;
-    });
+
+    const initial = movies.map((_, i) =>
+      i === center - 2
+        ? 1
+        : i === center - 1
+        ? 2
+        : i === center
+        ? 3
+        : i === center + 1
+        ? 4
+        : i === center + 2
+        ? 5
+        : 0
+    );
+
     setPositions(initial);
   }, [movies]);
 
   if (movies.length === 0) return null;
 
+  // Rotation identique à Home
   const handlePrev = () => {
-    setPositions((prev) => {
-      const newPositions = [...prev];
-      newPositions.forEach((_, i) => {
-        if (newPositions[i] === 1) newPositions[i] = 2;
-        else if (newPositions[i] === 2) newPositions[i] = 3;
-        else if (newPositions[i] === 3) newPositions[i] = 4;
-        else if (newPositions[i] === 4) newPositions[i] = 5;
-        else if (newPositions[i] === 5) newPositions[i] = 0;
-        else if (newPositions[i] === 0) {
-          const prevIndex = (i - 1 + movies.length) % movies.length;
-          if (newPositions[prevIndex] === 1) newPositions[i] = 1;
-        }
-      });
-      const firstZero = newPositions.findIndex((p) => p === 0);
-      if (firstZero !== -1) newPositions[firstZero] = 1;
-      return newPositions;
-    });
+    setPositions((p) => p.map((v) => (v === 0 ? 0 : v === 1 ? 5 : v - 1)));
   };
 
   const handleNext = () => {
-    setPositions((prev) => {
-      const newPositions = [...prev];
-      newPositions.forEach((_, i) => {
-        if (newPositions[i] === 5) newPositions[i] = 4;
-        else if (newPositions[i] === 4) newPositions[i] = 3;
-        else if (newPositions[i] === 3) newPositions[i] = 2;
-        else if (newPositions[i] === 2) newPositions[i] = 1;
-        else if (newPositions[i] === 1) newPositions[i] = 0;
-        else if (newPositions[i] === 0) {
-          const nextIndex = (i + 1) % movies.length;
-          if (newPositions[nextIndex] === 5) newPositions[i] = 5;
-        }
-      });
-      const lastFive = newPositions.lastIndexOf(5);
-      const nextIdx = (lastFive + 1) % movies.length;
-      if (newPositions[nextIdx] === 0) newPositions[nextIdx] = 5;
-      return newPositions;
-    });
+    setPositions((p) => p.map((v) => (v === 5 ? 1 : v === 0 ? 0 : v + 1)));
   };
 
   return (
-    <section className="similar-section py-5" style={{ background: "#150804", color: "#f5d7b7" }}>
+    <section className="similar-section py-5">
       <div className="container">
         <h2 className="mb-4">Similar titles</h2>
 
-        <div
-          style={{
-            height: "35rem",
-            width: "100%",
-            maxWidth: "1200px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "relative",
-            margin: "2rem auto",
-          }}
-        >
+        <div className="carousel-3d-wrapper">
           {/* Left Arrow */}
-          <div
-            onClick={handlePrev}
-            style={{
-              height: "100%",
-              width: "10%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              zIndex: 10,
-            }}
-          >
-            <i className="fa fa-angle-left" style={{ fontSize: "24px", color: "#f5d7b7" }}></i>
+          <div className="carousel-3d-arrow" onClick={handlePrev}>
+            <i className="fa fa-angle-left" />
           </div>
 
-          {/* Slider Content */}
-          <div
-            style={{
-              height: "100%",
-              width: "80%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative",
-              perspective: "100px",
-              overflow: "hidden",
-            }}
-          >
+          {/* Slider */}
+          <div className="carousel-3d-container">
             {movies.map((movie, index) => (
               <SimilarMovieCard key={movie.id} movie={movie} position={positions[index]} />
             ))}
-
-            {/* Gradient Overlay */}
-            <div
-              style={{
-                height: "100%",
-                width: "102%",
-                position: "absolute",
-                top: 0,
-                left: "-1%",
-                background:
-                  "linear-gradient(to left, #150804, transparent, transparent, transparent, #150804)",
-                zIndex: 3,
-                pointerEvents: "none",
-              }}
-            />
+            <div className="carousel-3d-fade" />
           </div>
 
           {/* Right Arrow */}
-          <div
-            onClick={handleNext}
-            style={{
-              height: "100%",
-              width: "10%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              zIndex: 10,
-            }}
-          >
-            <i className="fa fa-angle-right" style={{ fontSize: "24px", color: "#f5d7b7" }}></i>
+          <div className="carousel-3d-arrow" onClick={handleNext}>
+            <i className="fa fa-angle-right" />
           </div>
         </div>
       </div>
@@ -532,77 +451,50 @@ function SimilarSection({ movies }: { movies: Movie[] }) {
 
 function SimilarMovieCard({ movie, position }: { movie: Movie; position: number }) {
   const posterUrl = getMoviePosterUrl(movie);
-  const [isHovered, setIsHovered] = useState(false);
+  const [hover, setHover] = useState(false);
 
-  const getPositionStyles = () => {
-    const baseStyle = {
-      position: "absolute" as const,
+  const base: React.CSSProperties = {
+    position: "absolute",
+    left: "50%",
+    width: "14rem",
+    height: "24rem",
+    border: "3px solid #FFF0C4",
+    transition: "0.5s",
+    opacity: 0,
+    overflow: "hidden",
+  };
+
+  const map: Record<number, React.CSSProperties> = {
+    1: {
+      ...base,
       left: "50%",
-      height: "24rem",
-      maxHeight: "400px",
-      width: "14rem",
-      minWidth: "270px",
-      border: "3px solid #FFF0C4",
-      zIndex: 0,
-      opacity: 0,
-      transform: "translate(-50%, 0) rotateY(0deg) scale(1,1)",
-      transformStyle: "preserve-3d" as const,
-      transition:
-        "transform 0.5s ease-in-out, opacity 0.5s ease-in-out, left 0.5s ease-in-out, z-index 0s 0.25s ease-in-out, border-color 0.3s ease-in-out",
-      overflow: "hidden",
-    };
-
-    switch (position) {
-      case 1:
-        return {
-          ...baseStyle,
-          left: "20%",
-          zIndex: 1,
-          transform: "translate(-50%, 0) rotateY(-2deg) scale(0.8, 0.8)",
-          opacity: 1,
-        };
-      case 2:
-        return {
-          ...baseStyle,
-          left: "35%",
-          zIndex: 2,
-          transform: "translate(-50%, 0) rotateY(-1deg) scale(0.9, 0.9)",
-          opacity: 1,
-        };
-      case 3:
-        return {
-          ...baseStyle,
-          left: "50%",
-          zIndex: 4,
-          transform: "translate(-50%, 0) rotateY(0deg) scale(1, 1)",
-          opacity: 1,
-          cursor: "pointer",
-        };
-      case 4:
-        return {
-          ...baseStyle,
-          left: "65%",
-          zIndex: 2,
-          transform: "translate(-50%, 0) rotateY(1deg) scale(0.9, 0.9)",
-          opacity: 1,
-        };
-      case 5:
-        return {
-          ...baseStyle,
-          left: "80%",
-          zIndex: 1,
-          transform: "translate(-50%, 0) rotateY(2deg) scale(0.8, 0.8)",
-          opacity: 1,
-        };
-      default:
-        return {
-          ...baseStyle,
-          left: "50%",
-          zIndex: 0,
-          transform: "translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7)",
-          opacity: 0,
-        };
-    }
+      transform: "translateX(-50%) translateX(-280px) scale(0.8) rotateY(-2deg)",
+      opacity: 1,
+      zIndex: 1,
+    },
+    2: {
+      ...base,
+      left: "50%",
+      transform: "translateX(-50%) translateX(-140px) scale(0.9) rotateY(-1deg)",
+      opacity: 1,
+      zIndex: 2,
+    },
+    3: { ...base, left: "50%", transform: "translateX(-50%) scale(1)", opacity: 1, zIndex: 4 },
+    4: {
+      ...base,
+      left: "50%",
+      transform: "translateX(-50%) translateX(140px) scale(0.9) rotateY(1deg)",
+      opacity: 1,
+      zIndex: 2,
+    },
+    5: {
+      ...base,
+      left: "50%",
+      transform: "translateX(-50%) translateX(280px) scale(0.8) rotateY(2deg)",
+      opacity: 1,
+      zIndex: 1,
+    },
+    0: { ...base, opacity: 0, transform: "scale(0.6)" },
   };
 
   const isCenter = position === 3;
@@ -610,63 +502,33 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
   return (
     <Link
       to={`/film/${movie.id}`}
-      className="text-decoration-none"
       style={{
-        ...getPositionStyles(),
+        ...map[position],
         pointerEvents: isCenter ? "auto" : "none",
-        borderColor: isCenter && isHovered ? "#8C1007" : "#FFF0C4",
+        borderColor: isCenter && hover ? "#8C1007" : "#FFF0C4",
       }}
-      onMouseEnter={() => isCenter && setIsHovered(true)}
-      onMouseLeave={() => isCenter && setIsHovered(false)}
+      onMouseEnter={() => isCenter && setHover(true)}
+      onMouseLeave={() => isCenter && setHover(false)}
     >
+      {/* IMAGE */}
       {posterUrl ? (
         <img
           src={posterUrl}
-          alt={getMovieTitle(movie)}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
+          alt={movie.title}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
       ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            background: "#333",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span style={{ color: "#666" }}>No poster</span>
+        <div className="movie-card-placeholder">
+          <span>No poster</span>
         </div>
       )}
 
-      {/* Overlay noir au hover */}
-      {isCenter && isHovered && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-        >
-          <div
-            style={{
-              color: "#FFF0C4",
-              fontWeight: "600",
-              fontSize: "16px",
-              textAlign: "center",
-              textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-            }}
-          >
-            {getMovieTitle(movie)}
+      {/* === FULLSCREEN BLACK OVERLAY ON HOVER === */}
+      {isCenter && (
+        <div className={`similar-full-overlay ${hover ? "visible" : ""}`}>
+          <div className="overlay-text">
+            <div className="movie-card-title">{movie.title}</div>
+            <div className="movie-card-year">{movie.year}</div>
           </div>
         </div>
       )}
