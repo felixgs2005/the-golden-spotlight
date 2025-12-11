@@ -144,8 +144,10 @@ export default function ActorProfile() {
           <FilmographySection
             movies={movies}
             carouselPosition={carouselPosition}
-            onPrev={() => setCarouselPosition(Math.max(0, carouselPosition - 1))}
-            onNext={() => setCarouselPosition(Math.min(movies.length - 1, carouselPosition + 1))}
+            onPrev={() =>
+              setCarouselPosition((carouselPosition - 1 + movies.length) % movies.length)
+            }
+            onNext={() => setCarouselPosition((carouselPosition + 1) % movies.length)}
           />
         </div>
 
@@ -303,15 +305,19 @@ function FilmographySection({
 
   useEffect(() => {
     if (movies.length === 0) return;
+
     const newPositions = movies.map((_, i) => {
-      const diff = i - carouselPosition;
-      if (diff === -2) return 1;
-      if (diff === -1) return 2;
-      if (diff === 0) return 3;
-      if (diff === 1) return 4;
-      if (diff === 2) return 5;
+      const diff = (i - carouselPosition + movies.length) % movies.length;
+
+      if (diff === 0) return 1;
+      if (diff === 1) return 2;
+      if (diff === 2) return 3;
+      if (diff === 3) return 4;
+      if (diff === 4) return 5;
+
       return 0;
     });
+
     setPositions(newPositions);
   }, [movies, carouselPosition]);
 
@@ -346,15 +352,15 @@ function FilmographySection({
 
 function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
   const getPositionStyles = () => {
-    const baseStyle = {
-      position: "absolute" as const,
-      left: "50%",
+    const baseStyle: React.CSSProperties = {
+      position: "absolute",
+      left: "0%",
       height: "24rem",
       width: "14rem",
       borderRadius: "8px",
       zIndex: 0,
       opacity: 0,
-      transform: "translate(-50%, 0) scale(1)",
+      transform: "scale(1)",
       transition: "all 0.5s ease-in-out",
       overflow: "hidden",
     };
@@ -363,59 +369,59 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
       case 1:
         return {
           ...baseStyle,
-          left: "20%",
-          zIndex: 1,
-          transform: "scale(0.8)",
+          transform: "translateX(0px) scale(0.9)",
           opacity: 1,
-          filter: "blur(3px)",
+          zIndex: 5,
         };
+
       case 2:
         return {
           ...baseStyle,
-          left: "35%",
-          zIndex: 2,
-          transform: "scale(0.9)",
-          opacity: 1,
-          filter: "blur(1px)",
+          transform: "translateX(150px) scale(0.78)",
+          opacity: 0.9,
+          zIndex: 4,
         };
+
       case 3:
-        return { ...baseStyle, left: "50%", zIndex: 4, transform: "scale(1)", opacity: 1 };
+        return {
+          ...baseStyle,
+          transform: "translateX(280px) scale(0.68)",
+          opacity: 0.8,
+          zIndex: 3,
+        };
+
       case 4:
         return {
           ...baseStyle,
-          left: "65%",
+          transform: "translateX(390px) scale(0.58)",
+          opacity: 0.7,
           zIndex: 2,
-          transform: "scale(0.9)",
-          opacity: 1,
-          filter: "blur(1px)",
         };
+
       case 5:
         return {
           ...baseStyle,
-          left: "80%",
+          transform: "translateX(480px) scale(0.48)",
+          opacity: 0.6,
           zIndex: 1,
-          transform: "scale(0.8)",
-          opacity: 1,
-          filter: "blur(3px)",
         };
+
       default:
         return baseStyle;
     }
   };
 
-  const isCenter = position === 3;
-
   return (
     <Link to={`/film/${movie.id}`} className="film-card" style={getPositionStyles()}>
       {movie.posterUrl ? (
-        <img src={movie.posterUrl} alt={movie.title} className="film-card-img" />
+        <img
+          src={movie.posterUrl}
+          alt={movie.title}
+          className="film-card-img"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
       ) : (
         <div className="film-card-placeholder">No poster</div>
-      )}
-      {isCenter && (
-        <div className="film-card-overlay">
-          <div className="film-card-title">{movie.title}</div>
-        </div>
       )}
     </Link>
   );
