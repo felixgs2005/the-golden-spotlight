@@ -371,6 +371,16 @@
 
 /* ==================== SEE ALSO SECTION ==================== */
 
+.see-also-section {
+  margin-top: 6rem;
+}
+
+.see-also-section .section-title {
+  font-size: 2rem;
+  color: #FFF0C4;
+  margin-bottom: 2rem;
+}
+
 .similar-actors-scroll {
   display: flex;
   gap: 1rem;
@@ -381,17 +391,18 @@
 }
 
 .similar-actors-scroll::-webkit-scrollbar {
-  height: 8px;
+  height: 18px;
 }
 
 .similar-actors-scroll::-webkit-scrollbar-track {
   background: #2a0a0a;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .similar-actors-scroll::-webkit-scrollbar-thumb {
-  background: #FFF0C4;
-  border-radius: 4px;
+  background: #8C1007;
+  border: 1px solid #CEAE76;
+  border-radius: 6px;
 }
 
 .similar-actors-scroll::-webkit-scrollbar-thumb:hover {
