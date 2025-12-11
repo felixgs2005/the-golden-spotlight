@@ -261,7 +261,7 @@
 
 .section-title {
   font-size: 2rem;
-  font-weight: 600;
+  font-family: "ltc-broadway-engraved", sans-serif;
   color: #FFF0C4;
   margin-bottom: 2rem;
 }
@@ -274,7 +274,6 @@
   align-items: center;
   margin: 2rem 0;
   overflow: hidden;
-  /* empêche le spill horizontal */
 }
 
 /* ARROWS */
@@ -318,7 +317,6 @@
   display: block;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   position: absolute;
-  /* essentiel pour la cascade */
   transition: all 0.5s ease-in-out;
 }
 
@@ -326,14 +324,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
+  border: 4px solid #FFF0C4;
 }
 
 .film-card-placeholder {
   width: 100%;
   height: 100%;
   background: #333;
-  border-radius: 8px;
+  border: 4px solid #FFF0C4;
   display: flex;
   align-items: center;
   justify-content: center;
