@@ -28,8 +28,8 @@
 .actor-bottom {
   display: grid;
   grid-template-columns: 38% 60%;
-  gap: 3rem;
-  margin-top: 4rem;
+  gap: 4.5rem;
+  margin-top: 5rem;
 }
 
 /* Responsive for rows */
@@ -358,7 +358,9 @@
 .filmography-link a {
   color: #FFF0C4;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 1.5rem;
+  font-family: "montserrat", sans-serif;
+
 }
 
 .filmography-link a:hover {
