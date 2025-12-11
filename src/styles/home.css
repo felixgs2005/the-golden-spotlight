@@ -54,7 +54,7 @@
   color: #FFF0C4;
 }
 
-/* ========== CAROUSEL 3D ========== */
+/* ==================== CAROUSEL 3D GLOBAL ==================== */
 
 .carousel-3d-wrapper {
   position: relative;
@@ -83,7 +83,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(to left, #150804, transparent 20%, transparent 80%, #150804);
+  background: linear-gradient(to left, #150804 5%, transparent 20%, transparent 80%, #150804 5%);
+  opacity: 0.25;
   z-index: 3;
 }
 
@@ -95,7 +96,12 @@
   z-index: 10;
   font-size: 32px;
   color: #f5d7b7;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.carousel-3d-arrow:hover {
+  transform: scale(1.2);
 }
 
 .carousel-3d-arrow:first-of-type {
@@ -106,11 +112,10 @@
   grid-column: 3;
 }
 
-.carousel-3d-arrow:hover {
-  transform: scale(1.2);
-}
+/* ==================== FULL OVERLAY CARD (HOME + SIMILAR) ==================== */
 
-.home-full-overlay {
+.home-full-overlay,
+.similar-full-overlay {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0);
@@ -123,32 +128,69 @@
   pointer-events: none;
 }
 
-.home-full-overlay.visible {
+.home-full-overlay.visible,
+.similar-full-overlay.visible {
   background: rgba(0, 0, 0, 0.75);
   opacity: 1;
 }
 
-.home-overlay-text {
+.home-overlay-text,
+.overlay-text {
   width: 100%;
   transform: translateY(10px);
   transition: transform 0.25s ease;
 }
 
-.home-full-overlay.visible .home-overlay-text {
+.home-full-overlay.visible .home-overlay-text,
+.similar-full-overlay.visible .overlay-text {
   transform: translateY(0);
 }
 
-.home-overlay-title {
+.home-overlay-title,
+.movie-card-title {
   font-size: 1.1rem;
   font-weight: 700;
   color: #FFF0C4;
   margin-bottom: 2px;
 }
 
-.home-overlay-year {
+.home-overlay-year,
+.movie-card-year {
   font-size: 0.9rem;
   color: #f0d7b7;
   opacity: 0.9;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 992px) {
+  .carousel-3d-wrapper {
+    height: 28rem;
+  }
+
+  .carousel-3d-arrow {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-3d-wrapper {
+    height: 25rem;
+  }
+
+  .carousel-3d-arrow {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-3d-wrapper {
+    height: 20rem;
+  }
+
+  .carousel-3d-arrow {
+    font-size: 20px;
+  }
 }
 
 /* ========== RESPONSIVE ========== */
@@ -160,21 +202,9 @@
     font-size: 16px;
     padding: 4px 20px;
   }
-
-  .carousel-3d-wrapper {
-    height: 28rem;
-  }
-
-  .carousel-3d-arrow {
-    font-size: 24px;
-  }
 }
 
 @media (max-width: 480px) {
-  .carousel-3d-wrapper {
-    height: 24rem;
-  }
-
   .play-button {
     font-size: 14px;
     padding: 4px 16px;

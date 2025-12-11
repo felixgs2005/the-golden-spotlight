@@ -91,11 +91,23 @@ export async function getTopRatedMovies(): Promise<MovieCard[]> {
   return (data.results ?? []).map(mapToMovieCard);
 }
 
-export async function getPopularSeries(): Promise<MovieCard[]> {
-  const { data } = await api.get("/tv/popular", {
-    params: { language: DEFAULT_LANGUAGE },
+export async function getComingSoon(): Promise<MovieCard[]> {
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data } = await api.get("/movie/upcoming", {
+    params: {
+      language: DEFAULT_LANGUAGE,
+      region: "US",
+      include_adult: false,
+    },
   });
-  return (data.results ?? []).map(mapToMovieCard);
+
+  const filtered = (data.results ?? []).filter((movie: any) => {
+    const date = movie.release_date;
+    return date && date >= today;
+  });
+
+  return filtered.map(mapToMovieCard);
 }
 
 // ==================== CATEGORY PAGE ====================

@@ -1,4 +1,6 @@
-/* ==================== HERO SECTION ==================== */
+/* ============================= */
+/*        HERO SECTION           */
+/* ============================= */
 
 .film-hero {
     background-size: cover;
@@ -20,15 +22,14 @@
 }
 
 .poster img {
+    width: 100%;
     aspect-ratio: 2/3;
     background-color: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
 }
 
-/* ==================== DETAIL ITEMS ==================== */
+/* ============================= */
+/*       MOVIE INFO & DETAILS    */
+/* ============================= */
 
 .detail-item {
     display: flex;
@@ -47,7 +48,9 @@
     line-height: 1.4;
 }
 
-/* ==================== PLAY BUTTON ==================== */
+/* ============================= */
+/*         PLAY BUTTON           */
+/* ============================= */
 
 .play-button {
     position: absolute;
@@ -76,13 +79,14 @@
     color: #FFF0C4;
 }
 
-/* ==================== ACTORS SECTION ==================== */
+/* ============================= */
+/*       ACTORS SCROLL LIST      */
+/* ============================= */
 
 .actors-scroll-container {
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
-    overflow-y: hidden;
     padding-bottom: 1rem;
     scroll-behavior: smooth;
 }
@@ -101,10 +105,6 @@
     border-radius: 4px;
 }
 
-.actors-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #CEAE76;
-}
-
 .actor-card {
     width: 200px;
     min-width: 200px;
@@ -113,9 +113,8 @@
     flex-direction: column;
     align-items: center;
     border: 1px solid #FFF0C4;
-    flex-shrink: 0;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .actor-card:hover {
@@ -132,8 +131,8 @@
 .actor-photo-card {
     width: 100px;
     height: 100px;
-    object-fit: cover;
     border-radius: 50%;
+    object-fit: cover;
     margin-top: 15px;
 }
 
@@ -143,17 +142,15 @@
 }
 
 .actor-known-for {
-    color: #FFF0C4;
-    width: 100%;
-    padding: 35px;
-    text-align: center;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.9rem;
     opacity: 0;
     max-height: 0;
-    transition: all 0.3s ease;
+    padding: 35px;
+    text-align: center;
+    color: #FFF0C4;
     overflow: hidden;
+    transition: 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .actor-card:hover .actor-known-for {
@@ -161,14 +158,17 @@
     max-height: 60px;
 }
 
-/* ==================== SIMILAR SECTION ==================== */
+/* ============================= */
+/*        SIMILAR SECTION        */
+/* ============================= */
 
 .similar-section {
     background: #150804;
     color: #f5d7b7;
 }
 
-.carousel-3d-wrapper {
+/* Wrapper du carousel */
+.similar-section .carousel-3d-wrapper {
     position: relative;
     width: 100%;
     max-width: 1200px;
@@ -179,27 +179,32 @@
     align-items: center;
 }
 
-.carousel-3d-container {
+/* Container du carousel (désactivation du 3D pour retirer les ombres) */
+.similar-section .carousel-3d-container {
     grid-column: 2;
     width: 100%;
     height: 100%;
     position: relative;
-    perspective: 100px;
+    perspective: none !important;
+    transform-style: flat !important;
     overflow: visible;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.carousel-3d-fade {
+/* Fade overlay pour un effet plus clean */
+.similar-section .carousel-3d-fade {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(to left, #150804, transparent 15%, transparent 85%, #150804);
+    background: linear-gradient(to left, #150804 5%, transparent 20%, transparent 80%, #150804 5%);
+    opacity: 0.25;
     z-index: 3;
 }
 
-.carousel-3d-arrow {
+/* Flèches */
+.similar-section .carousel-3d-arrow {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -207,22 +212,23 @@
     z-index: 10;
     font-size: 32px;
     color: #f5d7b7;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
     user-select: none;
 }
 
-.carousel-3d-arrow:first-of-type {
-    grid-column: 1;
-}
-
-.carousel-3d-arrow:last-of-type {
-    grid-column: 3;
-}
-
-.carousel-3d-arrow:hover {
+.similar-section .carousel-3d-arrow:hover {
     transform: scale(1.2);
 }
 
+.similar-section .carousel-3d-arrow:first-of-type {
+    grid-column: 1;
+}
+
+.similar-section .carousel-3d-arrow:last-of-type {
+    grid-column: 3;
+}
+
+/* Overlay pour la carte centrale */
 .similar-full-overlay {
     position: absolute;
     inset: 0;
@@ -243,7 +249,6 @@
 
 .overlay-text {
     width: 100%;
-    text-align: left;
     transform: translateY(10px);
     transition: transform 0.25s ease;
 }
@@ -256,7 +261,6 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: #FFF0C4;
-    margin-bottom: 2px;
 }
 
 .movie-card-year {
@@ -265,7 +269,37 @@
     opacity: 0.9;
 }
 
-/* ==================== RESPONSIVE TABLET ==================== */
+/* RESPONSIVE MATCH HOME */
+@media (max-width: 992px) {
+    .similar-section .carousel-3d-wrapper {
+        height: 28rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .similar-section .carousel-3d-wrapper {
+        height: 25rem;
+    }
+
+    .similar-section .carousel-3d-arrow {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .similar-section .carousel-3d-wrapper {
+        height: 20rem;
+    }
+
+    .similar-section .carousel-3d-arrow {
+        font-size: 20px;
+    }
+}
+
+
+/* ============================= */
+/*      RESPONSIVE BREAKPOINTS   */
+/* ============================= */
 
 @media (max-width: 992px) {
     .film-hero {
@@ -273,20 +307,10 @@
     }
 
     .play-button {
-        font-size: 18px;
-        padding: 5px 25px;
-        gap: 15px;
         bottom: 45px;
         left: 65%;
-    }
-
-    .detail-item strong {
-        font-size: 0.7rem;
-        margin-top: 20px;
-    }
-
-    .resultDetailsRight {
-        font-size: 0.95rem;
+        font-size: 18px;
+        padding: 5px 25px;
     }
 
     .actor-card {
@@ -294,8 +318,6 @@
         min-height: 230px;
     }
 }
-
-/* ==================== RESPONSIVE MOBILE ==================== */
 
 @media (max-width: 768px) {
     .film-hero {
@@ -313,134 +335,52 @@
         margin: 0 auto 2rem !important;
     }
 
-    .over-overlay>.col-md-8 {
-        margin-left: 0 !important;
-        width: 100%;
-    }
-
-    .over-overlay .row>div {
-        width: 100% !important;
-        margin-top: 0 !important;
-    }
-
     .play-button {
         position: static;
         transform: none;
         margin: 2rem auto 0;
-        width: fit-content;
         font-size: 16px;
         padding: 8px 24px;
-        gap: 12px;
     }
 
     .detail-item {
         display: none;
     }
 
-    .actors-scroll-container {
-        gap: 1rem;
-    }
-
     .actor-card {
         width: 150px;
-        min-width: 150px;
         min-height: 200px;
-    }
-
-    .actor-card img {
-        width: 80px !important;
-        height: 80px !important;
-    }
-
-    .name-actor {
-        margin-top: 20px;
-        font-size: 0.9rem;
-    }
-
-    .carousel-3d-wrapper {
-        height: 25rem;
-    }
-
-    .similar-section h2 {
-        font-size: 1.5rem;
     }
 }
 
-/* ==================== RESPONSIVE PETIT MOBILE ==================== */
-
 @media (max-width: 480px) {
-    .film-hero {
-        background-position: center top;
+    .badge-age {
+        font-size: 0.7rem !important;
     }
 
     h1.fw-bold {
         font-size: 1.75rem !important;
     }
 
-    .d-flex.gap-2 {
-        font-size: 0.85rem;
-    }
-
-    .badge-age {
-        font-size: 0.7rem !important;
+    .actor-card {
+        width: 130px;
+        min-height: 180px;
     }
 
     .play-button {
         font-size: 14px;
         padding: 6px 20px;
-        gap: 10px;
-    }
-
-    .actor-card {
-        width: 130px;
-        min-width: 130px;
-        min-height: 180px;
-    }
-
-    .actor-card img {
-        width: 70px !important;
-        height: 70px !important;
-        margin-top: 10px;
-    }
-
-    .name-actor {
-        font-size: 0.85rem;
-        margin-top: 15px;
-    }
-
-    .carousel-3d-wrapper {
-        height: 20rem;
-    }
-
-    .similar-section h2 {
-        font-size: 1.25rem;
-    }
-
-    .carousel-3d-arrow {
-        font-size: 20px;
     }
 }
-
-/* ==================== RESPONSIVE TRÈS PETIT MOBILE ==================== */
 
 @media (max-width: 360px) {
     .poster {
         max-width: 250px;
     }
 
-    h1.fw-bold {
-        font-size: 1.5rem !important;
-    }
-
     .actor-card {
         width: 110px;
-        min-width: 110px;
         min-height: 160px;
-    }
-
-    .actor-card img {
-        width: 60px !important;
-        height: 60px !important;
     }
 
     .play-button {

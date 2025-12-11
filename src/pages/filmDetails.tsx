@@ -62,7 +62,7 @@ export default function FilmDetails() {
   const { movie } = state;
   const rating = getMovieRating(movie);
   const topCast = getTopCast(movie, 12);
-  const similarMovies = getSimilarMovies(movie, 6);
+  const similarMovies = getSimilarMovies(movie, 7);
   const trailerUrl = getTrailerUrl(movie);
 
   return (
@@ -384,41 +384,19 @@ function ActorCard({ actor }: { actor: any }) {
 // ==================== SIMILAR SECTION ====================
 
 function SimilarSection({ movies }: { movies: Movie[] }) {
-  const [positions, setPositions] = useState<number[]>([]);
+  const [startIndex, setStartIndex] = useState(0);
 
-  // Initialisation identique à HomeCarousel3D
-  useEffect(() => {
-    if (movies.length === 0) return;
+  const positions = [1, 2, 3, 4, 5, 6, 7];
 
-    const center = Math.floor(movies.length / 2);
+  const prev = () => {
+    setStartIndex((prev) => (prev - 1 + movies.length) % movies.length);
+  };
 
-    const initial = movies.map((_, i) =>
-      i === center - 2
-        ? 1
-        : i === center - 1
-        ? 2
-        : i === center
-        ? 3
-        : i === center + 1
-        ? 4
-        : i === center + 2
-        ? 5
-        : 0
-    );
-
-    setPositions(initial);
-  }, [movies]);
+  const next = () => {
+    setStartIndex((prev) => (prev + 1) % movies.length);
+  };
 
   if (movies.length === 0) return null;
-
-  // Rotation identique à Home
-  const handlePrev = () => {
-    setPositions((p) => p.map((v) => (v === 0 ? 0 : v === 1 ? 5 : v - 1)));
-  };
-
-  const handleNext = () => {
-    setPositions((p) => p.map((v) => (v === 5 ? 1 : v === 0 ? 0 : v + 1)));
-  };
 
   return (
     <section className="similar-section py-5">
@@ -426,21 +404,20 @@ function SimilarSection({ movies }: { movies: Movie[] }) {
         <h2 className="mb-4">Similar titles</h2>
 
         <div className="carousel-3d-wrapper">
-          {/* Left Arrow */}
-          <div className="carousel-3d-arrow" onClick={handlePrev}>
+          <div className="carousel-3d-arrow" onClick={prev}>
             <i className="fa fa-angle-left" />
           </div>
 
-          {/* Slider */}
           <div className="carousel-3d-container">
-            {movies.map((movie, index) => (
-              <SimilarMovieCard key={movie.id} movie={movie} position={positions[index]} />
-            ))}
-            <div className="carousel-3d-fade" />
+            {positions.map((pos, i) => {
+              const movieIndex = (startIndex + i) % movies.length;
+              const movie = movies[movieIndex];
+
+              return <SimilarMovieCard key={i} movie={movie} position={pos} />;
+            })}
           </div>
 
-          {/* Right Arrow */}
-          <div className="carousel-3d-arrow" onClick={handleNext}>
+          <div className="carousel-3d-arrow" onClick={next}>
             <i className="fa fa-angle-right" />
           </div>
         </div>
@@ -467,37 +444,45 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
   const map: Record<number, React.CSSProperties> = {
     1: {
       ...base,
-      left: "50%",
-      transform: "translateX(-50%) translateX(-280px) scale(0.8) rotateY(-2deg)",
+      transform: "translateX(-50%) translateX(-420px) scale(0.75)",
       opacity: 1,
       zIndex: 1,
     },
     2: {
       ...base,
-      left: "50%",
-      transform: "translateX(-50%) translateX(-140px) scale(0.9) rotateY(-1deg)",
+      transform: "translateX(-50%) translateX(-280px) scale(0.82)",
       opacity: 1,
       zIndex: 2,
     },
-    3: { ...base, left: "50%", transform: "translateX(-50%) scale(1)", opacity: 1, zIndex: 4 },
-    4: {
+    3: {
       ...base,
-      left: "50%",
-      transform: "translateX(-50%) translateX(140px) scale(0.9) rotateY(1deg)",
+      transform: "translateX(-50%) translateX(-140px) scale(0.90)",
       opacity: 1,
-      zIndex: 2,
+      zIndex: 3,
     },
+    4: { ...base, transform: "translateX(-50%) scale(1)", opacity: 1, zIndex: 5 },
     5: {
       ...base,
-      left: "50%",
-      transform: "translateX(-50%) translateX(280px) scale(0.8) rotateY(2deg)",
+      transform: "translateX(-50%) translateX(140px) scale(0.90)",
+      opacity: 1,
+      zIndex: 3,
+    },
+    6: {
+      ...base,
+      transform: "translateX(-50%) translateX(280px) scale(0.82)",
+      opacity: 1,
+      zIndex: 2,
+    },
+    7: {
+      ...base,
+      transform: "translateX(-50%) translateX(420px) scale(0.75)",
       opacity: 1,
       zIndex: 1,
     },
     0: { ...base, opacity: 0, transform: "scale(0.6)" },
   };
 
-  const isCenter = position === 3;
+  const isCenter = position === 4;
 
   return (
     <Link
@@ -510,7 +495,6 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
       onMouseEnter={() => isCenter && setHover(true)}
       onMouseLeave={() => isCenter && setHover(false)}
     >
-      {/* IMAGE */}
       {posterUrl ? (
         <img
           src={posterUrl}
@@ -518,12 +502,9 @@ function SimilarMovieCard({ movie, position }: { movie: Movie; position: number 
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
       ) : (
-        <div className="movie-card-placeholder">
-          <span>No poster</span>
-        </div>
+        <div className="movie-card-placeholder">No poster</div>
       )}
 
-      {/* === FULLSCREEN BLACK OVERLAY ON HOVER === */}
       {isCenter && (
         <div className={`similar-full-overlay ${hover ? "visible" : ""}`}>
           <div className="overlay-text">
