@@ -444,6 +444,8 @@
 .similar-actor-name {
   margin-top: 30px;
   color: #FFF0C4;
+  font-family: "montserrat", sans-serif;
+  font-size: large;
 }
 
 .actor-view-profile {
