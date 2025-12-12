@@ -1,0 +1,270 @@
+/* ------------------------------------------------------ */
+/*                    CAROUSEL SECTION WRAPPER            */
+/* ------------------------------------------------------ */
+
+.carousel-section {
+    position: relative;
+    padding: 4rem 0 6rem;
+    background: #150804;
+}
+
+.carousel-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+.carousel-title {
+    font-family: "ltc-broadway-engraved", serif;
+    font-size: 2.8rem;
+    color: #FFF0C4;
+    text-align: left;
+    margin-bottom: 2.5rem;
+    letter-spacing: 1px;
+}
+
+/* ------------------------------------------------------ */
+/*                 ART DECO FRAME AROUND CAROUSEL         */
+/* ------------------------------------------------------ */
+
+.carousel-frame {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+
+.carousel-frame-inner {
+    position: relative;
+    overflow: hidden;
+}
+
+
+.carousel-frame::before,
+.carousel-frame::after,
+.carousel-frame .corner-bottom::before,
+.carousel-frame .corner-bottom::after {
+    content: "";
+    position: absolute;
+    width: 330px;
+    height: 330px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    pointer-events: none;
+}
+
+/* TOP LEFT */
+.carousel-frame::before {
+    top: 0;
+    left: 0;
+    background-image: url("/src/assets/images/Decoration/corner_TL.svg");
+}
+
+/* TOP RIGHT */
+.carousel-frame::after {
+    top: 0;
+    right: 0;
+    background-image: url("/src/assets/images/Decoration/corner_TR.svg");
+}
+
+/* bottom container to hold BL & BR */
+.corner-bottom {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* BOTTOM LEFT */
+.corner-bottom::before {
+    bottom: 0;
+    left: 0;
+    background-image: url("/src/assets/images/Decoration/corner_BL.svg");
+}
+
+/* BOTTOM RIGHT */
+.corner-bottom::after {
+    bottom: 0;
+    right: 0;
+    background-image: url("/src/assets/images/Decoration/corner_BR.svg");
+}
+
+/* ------------------------------------------------------ */
+/*                   3D CAROUSEL CORE                     */
+/* ------------------------------------------------------ */
+
+.carousel-3d-wrapper {
+    position: relative;
+    width: 100%;
+    height: 32rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+
+.carousel-3d-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ------------------------------------------------------ */
+/*                        ARROWS                          */
+/* ------------------------------------------------------ */
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: transparent;
+    border: none;
+    color: #CEAE76;
+    font-size: 3rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.carousel-arrow.left {
+    left: 3rem;
+}
+
+.carousel-arrow.right {
+    right: 3rem;
+}
+
+.carousel-arrow:hover {
+    transform: translateY(-50%) scale(1.15);
+    color: #f0d7b7;
+}
+
+/* ------------------------------------------------------ */
+/*                   3D CARDS (POSITIONED)                */
+/* ------------------------------------------------------ */
+
+.carousel-card {
+    position: absolute;
+    transform-style: preserve-3d;
+    width: 14rem;
+    height: 24rem;
+    border: 3px solid #FFF0C4;
+    overflow: hidden;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.55),
+        0 12px 25px rgba(0, 0, 0, 0.45),
+        0 4px 10px rgba(0, 0, 0, 0.35);
+    transition:
+        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 0.45s ease,
+        border-color 0.3s ease;
+}
+
+
+.carousel-card:hover {
+    transform: scale(1.04);
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.carousel-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1rem;
+    transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+.carousel-card-overlay.visible {
+    background: rgba(0, 0, 0, 0.75);
+    opacity: 1;
+}
+
+.carousel-overlay-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FFF0C4;
+}
+
+.carousel-overlay-year {
+    font-size: 0.85rem;
+    color: #f0d7b7;
+}
+
+/* ------------------------------------------------------ */
+/*                        RESPONSIVE                      */
+/* ------------------------------------------------------ */
+
+@media (max-width: 992px) {
+    .carousel-card {
+        width: 11rem;
+        height: 19rem;
+    }
+
+    .carousel-title {
+        font-size: 2.3rem;
+        margin-left: 2rem;
+    }
+
+    .carousel-3d-wrapper {
+        height: 26rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-card {
+        width: 9rem;
+        height: 15rem;
+    }
+
+    .carousel-title {
+        font-size: 2rem;
+        text-align: center;
+        margin-left: 0;
+    }
+
+    .carousel-frame::before,
+    .carousel-frame::after,
+    .corner-bottom::before,
+    .corner-bottom::after {
+        width: 120px;
+        height: 120px;
+    }
+
+    .carousel-arrow.left {
+        left: 0.75rem;
+    }
+
+    .carousel-arrow.right {
+        right: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-card {
+        width: 7.5rem;
+        height: 12rem;
+    }
+
+    .carousel-title {
+        font-size: 1.7rem;
+    }
+
+    .carousel-3d-wrapper {
+        height: 20rem;
+    }
+}

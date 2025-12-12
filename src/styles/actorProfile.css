@@ -44,7 +44,7 @@
 }
 
 /* ==================== OLD HERO SECTION (no longer structuring layout) ==================== */
-/* (Kept for styling but layout is now handled by .actor-top and .actor-bottom) */
+/* (Kept for styling but layout is handled by .actor-top and .actor-bottom) */
 
 .actor-hero {
   display: contents;
