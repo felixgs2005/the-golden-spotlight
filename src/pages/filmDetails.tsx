@@ -21,6 +21,7 @@ import {
 } from "../api/mapper";
 import type { Movie } from "../types/domains";
 import "../styles/filmDetail.css";
+import "../styles/carousel3d.css";
 
 type State =
   | { status: "idle" }
