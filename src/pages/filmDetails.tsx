@@ -23,6 +23,30 @@ import type { Movie } from "../types/domains";
 import "../styles/filmDetail.css";
 import "../styles/carousel3d.css";
 
+// ========================== HOOK RESPONSIVE ==========================
+
+function useCarouselSize() {
+  const [visibleCards, setVisibleCards] = useState(7);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth <= 768) {
+        setVisibleCards(3); // Mobile: 3 cartes
+      } else if (window.innerWidth <= 992) {
+        setVisibleCards(5); // Tablette: 5 cartes
+      } else {
+        setVisibleCards(7); // Desktop: 7 cartes
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  return visibleCards;
+}
+
 type State =
   | { status: "idle" }
   | { status: "loading" }
@@ -224,10 +248,8 @@ function TrailerButton({ trailerUrl, onPlay }: { trailerUrl?: string; onPlay: ()
 
 function TrailerModal({ trailerUrl, onClose }: { trailerUrl: string; onClose: () => void }) {
   useEffect(() => {
-    // Bloquer le scroll du body quand le modal est ouvert
     document.body.style.overflow = "hidden";
 
-    // Fermer avec la touche Escape
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -240,7 +262,6 @@ function TrailerModal({ trailerUrl, onClose }: { trailerUrl: string; onClose: ()
     };
   }, [onClose]);
 
-  // Convertir l'URL YouTube en embed
   const embedUrl = trailerUrl.includes("watch?v=")
     ? trailerUrl.replace("watch?v=", "embed/")
     : trailerUrl;
@@ -262,7 +283,6 @@ function TrailerModal({ trailerUrl, onClose }: { trailerUrl: string; onClose: ()
       }}
       onClick={onClose}
     >
-      {/* Close button */}
       <button
         onClick={onClose}
         style={{
@@ -283,7 +303,6 @@ function TrailerModal({ trailerUrl, onClose }: { trailerUrl: string; onClose: ()
         ×
       </button>
 
-      {/* Video container */}
       <div
         style={{
           position: "relative",
@@ -328,7 +347,6 @@ function MovieDetails({
       <DetailItem label="Starring" value={getMovieCastNames(movie, 3)} />
       <DetailItem label="Director" value={getMovieDirector(movie)} />
 
-      {/* Trailer Button at the bottom */}
       <div className="mt-auto pt-3">
         <TrailerButton trailerUrl={trailerUrl} onPlay={onPlayTrailer} />
       </div>
@@ -382,12 +400,13 @@ function ActorCard({ actor }: { actor: any }) {
   );
 }
 
-// ==================== SIMILAR SECTION ====================
+// ==================== SIMILAR SECTION (RESPONSIVE) ====================
 
 function SimilarSection({ movies }: { movies: Movie[] }) {
   const [startIndex, setStartIndex] = useState(0);
+  const visibleCards = useCarouselSize();
 
-  const positions = [1, 2, 3, 4, 5, 6, 7];
+  const positions = Array.from({ length: visibleCards }, (_, i) => i + 1);
 
   const prev = () => {
     setStartIndex((prev) => (prev - 1 + movies.length) % movies.length);
@@ -402,29 +421,31 @@ function SimilarSection({ movies }: { movies: Movie[] }) {
   return (
     <section className="carousel-section">
       <div className="carousel-shell">
-        {/* TITLE */}
         <h2 className="carousel-title">Similar titles</h2>
 
-        {/* ART DECO FRAME */}
         <div className="carousel-frame">
           <div className="corner-bottom"></div>
 
           <div className="carousel-frame-inner">
             <div className="carousel-3d-wrapper">
-              {/* LEFT ARROW */}
               <button className="carousel-arrow left" onClick={prev} aria-label="Previous">
                 <i className="fa fa-angle-left" />
               </button>
 
-              {/* 3D CARDS */}
               <div className="carousel-3d-container">
                 {positions.map((pos, i) => {
                   const movieIndex = (startIndex + i) % movies.length;
-                  return <SimilarMovieCard key={i} movie={movies[movieIndex]} position={pos} />;
+                  return (
+                    <SimilarMovieCard
+                      key={i}
+                      movie={movies[movieIndex]}
+                      position={pos}
+                      totalVisible={visibleCards}
+                    />
+                  );
                 })}
               </div>
 
-              {/* RIGHT ARROW */}
               <button className="carousel-arrow right" onClick={next} aria-label="Next">
                 <i className="fa fa-angle-right" />
               </button>
@@ -436,72 +457,135 @@ function SimilarSection({ movies }: { movies: Movie[] }) {
   );
 }
 
-function SimilarMovieCard({ movie, position }: { movie: Movie; position: number }) {
+function SimilarMovieCard({
+  movie,
+  position,
+  totalVisible,
+}: {
+  movie: Movie;
+  position: number;
+  totalVisible: number;
+}) {
   const posterUrl = getMoviePosterUrl(movie);
   const [hover, setHover] = useState(false);
+
+  // Tailles de cartes selon le nombre visible
+  const cardSizes: Record<number, { width: string; height: string }> = {
+    7: { width: "14rem", height: "24rem" },
+    5: { width: "11rem", height: "19rem" },
+    3: { width: "7rem", height: "13rem" },
+  };
+
+  const size = cardSizes[totalVisible as 7 | 5 | 3];
 
   const base: React.CSSProperties = {
     position: "absolute",
     left: "50%",
+    width: size.width,
+    height: size.height,
+    border: "3px solid #FFF0C4",
+    transition: "0.45s ease",
     opacity: 0,
     overflow: "hidden",
   };
 
-  const map: Record<number, React.CSSProperties> = {
-    1: {
-      ...base,
-      transform: "translateX(-50%) translateX(-420px) scale(0.5)",
-      opacity: 1,
-      zIndex: 1,
-    },
-    2: {
-      ...base,
-      transform: "translateX(-50%) translateX(-300px) scale(0.68)",
-      opacity: 1,
-      zIndex: 2,
-    },
-    3: {
-      ...base,
-      transform: "translateX(-50%) translateX(-170px) scale(0.85)",
-      opacity: 1,
-      zIndex: 3,
-    },
-    4: {
-      ...base,
-      transform: "translateX(-50%) scale(1)",
-      opacity: 1,
-      zIndex: 5,
+  // Configurations pour 7, 5 et 3 cartes
+  const styleConfigs: Record<number, Record<number, React.CSSProperties>> = {
+    7: {
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-420px) scale(0.5)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: {
+        ...base,
+        transform: "translateX(-50%) translateX(-300px) scale(0.68)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      3: {
+        ...base,
+        transform: "translateX(-50%) translateX(-170px) scale(0.85)",
+        opacity: 1,
+        zIndex: 3,
+      },
+      4: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      5: {
+        ...base,
+        transform: "translateX(-50%) translateX(170px) scale(0.85)",
+        opacity: 1,
+        zIndex: 3,
+      },
+      6: {
+        ...base,
+        transform: "translateX(-50%) translateX(300px) scale(0.68)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      7: {
+        ...base,
+        transform: "translateX(-50%) translateX(420px) scale(0.5)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
     5: {
-      ...base,
-      transform: "translateX(-50%) translateX(170px) scale(0.85)",
-      opacity: 1,
-      zIndex: 3,
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-225px) scale(0.7)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: {
+        ...base,
+        transform: "translateX(-50%) translateX(-125px) scale(0.85)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      3: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      4: {
+        ...base,
+        transform: "translateX(-50%) translateX(125px) scale(0.85)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      5: {
+        ...base,
+        transform: "translateX(-50%) translateX(225px) scale(0.7)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
-    6: {
-      ...base,
-      transform: "translateX(-50%) translateX(300px) scale(0.68)",
-      opacity: 1,
-      zIndex: 2,
+    3: {
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-95px) scale(0.8)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      3: {
+        ...base,
+        transform: "translateX(-50%) translateX(95px) scale(0.8)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
-    7: {
-      ...base,
-      transform: "translateX(-50%) translateX(420px) scale(0.5)",
-      opacity: 1,
-      zIndex: 1,
-    },
-    0: { ...base, opacity: 0, transform: "scale(0.4)" },
   };
 
-  const isCenter = position === 4;
+  const centerPosition = Math.ceil(totalVisible / 2);
+  const isCenter = position === centerPosition;
+  const styleMap = styleConfigs[totalVisible as 7 | 5 | 3];
 
   return (
     <Link
       to={`/film/${movie.id}`}
       className="carousel-card"
       style={{
-        ...map[position],
+        ...styleMap[position],
         pointerEvents: isCenter ? "auto" : "none",
+        borderColor: isCenter && hover ? "#8C1007" : "#FFF0C4",
       }}
       onMouseEnter={() => isCenter && setHover(true)}
       onMouseLeave={() => isCenter && setHover(false)}

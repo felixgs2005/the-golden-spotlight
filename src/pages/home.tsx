@@ -11,6 +11,30 @@ import {
   type MovieCard,
 } from "../api/tmdb";
 
+// ========================== HOOK RESPONSIVE ==========================
+
+function useCarouselSize() {
+  const [visibleCards, setVisibleCards] = useState(7);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth <= 768) {
+        setVisibleCards(3); // Mobile: 3 cartes
+      } else if (window.innerWidth <= 992) {
+        setVisibleCards(5); // Tablette: 5 cartes
+      } else {
+        setVisibleCards(7); // Desktop: 7 cartes
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  return visibleCards;
+}
+
 // ========================== STATE TYPE ==========================
 
 type HomeState =
@@ -27,66 +51,125 @@ type HomeState =
 
 // ========================== 3D CARD ==========================
 
-function Home3DCard({ movie, position }: { movie: MovieCard; position: number }) {
+function Home3DCard({
+  movie,
+  position,
+  totalVisible,
+}: {
+  movie: MovieCard;
+  position: number;
+  totalVisible: number;
+}) {
   const [hover, setHover] = useState(false);
+
+  // Tailles de cartes selon le nombre visible
+  const cardSizes: Record<number, { width: string; height: string }> = {
+    7: { width: "14rem", height: "24rem" },
+    5: { width: "11rem", height: "19rem" },
+    3: { width: "7rem", height: "13rem" },
+  };
+
+  const size = cardSizes[totalVisible as 7 | 5 | 3];
 
   const base: React.CSSProperties = {
     position: "absolute",
     left: "50%",
-    width: "14rem",
-    height: "24rem",
+    width: size.width,
+    height: size.height,
     border: "3px solid #FFF0C4",
     transition: "0.45s ease",
     opacity: 0,
     overflow: "hidden",
   };
 
-  const styleMap: Record<number, React.CSSProperties> = {
-    1: {
-      ...base,
-      transform: "translateX(-50%) translateX(-420px)  scale(0.5)",
-      opacity: 1,
-      zIndex: 1,
-    },
-    2: {
-      ...base,
-      transform: "translateX(-50%) translateX(-300px)  scale(0.68)",
-      opacity: 1,
-      zIndex: 2,
-    },
-    3: {
-      ...base,
-      transform: "translateX(-50%) translateX(-170px)  scale(0.85)",
-      opacity: 1,
-      zIndex: 3,
-    },
-    4: {
-      ...base,
-      transform: "translateX(-50%) translateY(0) scale(1)",
-      opacity: 1,
-      zIndex: 5,
+  // Configurations pour 7, 5 et 3 cartes
+  const styleConfigs: Record<number, Record<number, React.CSSProperties>> = {
+    7: {
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-420px) scale(0.5)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: {
+        ...base,
+        transform: "translateX(-50%) translateX(-300px) scale(0.68)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      3: {
+        ...base,
+        transform: "translateX(-50%) translateX(-170px) scale(0.85)",
+        opacity: 1,
+        zIndex: 3,
+      },
+      4: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      5: {
+        ...base,
+        transform: "translateX(-50%) translateX(170px) scale(0.85)",
+        opacity: 1,
+        zIndex: 3,
+      },
+      6: {
+        ...base,
+        transform: "translateX(-50%) translateX(300px) scale(0.68)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      7: {
+        ...base,
+        transform: "translateX(-50%) translateX(420px) scale(0.5)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
     5: {
-      ...base,
-      transform: "translateX(-50%) translateX(170px)  scale(0.85)",
-      opacity: 1,
-      zIndex: 3,
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-225px) scale(0.7)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: {
+        ...base,
+        transform: "translateX(-50%) translateX(-125px) scale(0.85)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      3: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      4: {
+        ...base,
+        transform: "translateX(-50%) translateX(125px) scale(0.85)",
+        opacity: 1,
+        zIndex: 2,
+      },
+      5: {
+        ...base,
+        transform: "translateX(-50%) translateX(225px) scale(0.7)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
-    6: {
-      ...base,
-      transform: "translateX(-50%) translateX(300px)  scale(0.68)",
-      opacity: 1,
-      zIndex: 2,
-    },
-    7: {
-      ...base,
-      transform: "translateX(-50%) translateX(420px)  scale(0.5)",
-      opacity: 1,
-      zIndex: 1,
+    3: {
+      1: {
+        ...base,
+        transform: "translateX(-50%) translateX(-95px) scale(0.8)",
+        opacity: 1,
+        zIndex: 1,
+      },
+      2: { ...base, transform: "translateX(-50%) translateY(0) scale(1)", opacity: 1, zIndex: 5 },
+      3: {
+        ...base,
+        transform: "translateX(-50%) translateX(95px) scale(0.8)",
+        opacity: 1,
+        zIndex: 1,
+      },
     },
   };
 
-  const isCenter = position === 4;
+  const centerPosition = Math.ceil(totalVisible / 2);
+  const isCenter = position === centerPosition;
+  const styleMap = styleConfigs[totalVisible as 7 | 5 | 3];
 
   return (
     <Link
@@ -116,8 +199,9 @@ function Home3DCard({ movie, position }: { movie: MovieCard; position: number })
 
 function HomeCarousel3D({ title, movies }: { title: string; movies: MovieCard[] }) {
   const [startIndex, setStartIndex] = useState(0);
+  const visibleCards = useCarouselSize();
 
-  const positions = [1, 2, 3, 4, 5, 6, 7];
+  const positions = Array.from({ length: visibleCards }, (_, i) => i + 1);
 
   const prev = () => setStartIndex((prev) => (prev - 1 + movies.length) % movies.length);
 
@@ -144,7 +228,14 @@ function HomeCarousel3D({ title, movies }: { title: string; movies: MovieCard[] 
               <div className="carousel-3d-container">
                 {positions.map((pos, i) => {
                   const movieIndex = (startIndex + i) % movies.length;
-                  return <Home3DCard key={i} movie={movies[movieIndex]} position={pos} />;
+                  return (
+                    <Home3DCard
+                      key={i}
+                      movie={movies[movieIndex]}
+                      position={pos}
+                      totalVisible={visibleCards}
+                    />
+                  );
                 })}
               </div>
 
