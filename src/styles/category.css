@@ -196,7 +196,7 @@ textarea:focus::placeholder {
 
 .date-input {
     flex: 1;
-    max-width: 150px;
+    max-width: 140px;
     padding: 0.45rem 0.75rem;
     background: #FFF8E8;
     border: 1px solid #CEAE76;
@@ -230,7 +230,7 @@ textarea:focus::placeholder {
 .genres-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .genre-tag {
@@ -240,7 +240,6 @@ textarea:focus::placeholder {
     background: transparent;
     border-radius: 6px;
     font-size: 0.875rem;
-    text-align: center;
     transition: all 0.15s ease;
 }
 
@@ -503,9 +502,13 @@ textarea:focus::placeholder {
 
 /* ==================== RESPONSIVE ==================== */
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .genres-grid {
         grid-template-columns: 1fr;
+    }
+
+    .date-input {
+        max-width: 75px;
     }
 }
 
