@@ -11,8 +11,8 @@
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
+    padding: 0 1rem;
 }
-
 
 .carousel-title {
     font-family: "ltc-broadway-engraved", serif;
@@ -33,12 +33,10 @@
     margin: 0 auto;
 }
 
-
 .carousel-frame-inner {
     position: relative;
     overflow: hidden;
 }
-
 
 .carousel-frame::before,
 .carousel-frame::after,
@@ -102,7 +100,6 @@
     user-select: none;
 }
 
-
 .carousel-3d-container {
     position: relative;
     width: 100%;
@@ -150,8 +147,6 @@
 .carousel-card {
     position: absolute;
     transform-style: preserve-3d;
-    width: 14rem;
-    height: 24rem;
     border: 3px solid #FFF0C4;
     overflow: hidden;
     box-shadow:
@@ -164,7 +159,6 @@
         border-color 0.3s ease;
 }
 
-
 .carousel-card:hover {
     transform: scale(1.04);
 }
@@ -174,7 +168,6 @@
     height: 100%;
     object-fit: cover;
 }
-
 
 .carousel-card-overlay {
     position: absolute;
@@ -205,15 +198,10 @@
 }
 
 /* ------------------------------------------------------ */
-/*                        RESPONSIVE                      */
+/*                  RESPONSIVE - TABLETTE (5 cartes)      */
 /* ------------------------------------------------------ */
 
 @media (max-width: 992px) {
-    .carousel-card {
-        width: 11rem;
-        height: 19rem;
-    }
-
     .carousel-title {
         font-size: 2.3rem;
         margin-left: 2rem;
@@ -222,18 +210,37 @@
     .carousel-3d-wrapper {
         height: 26rem;
     }
-}
 
-@media (max-width: 768px) {
-    .carousel-card {
-        width: 9rem;
-        height: 15rem;
+    .carousel-arrow.left {
+        left: 1.5rem;
     }
 
+    .carousel-arrow.right {
+        right: 1.5rem;
+    }
+
+    .carousel-frame::before,
+    .carousel-frame::after,
+    .corner-bottom::before,
+    .corner-bottom::after {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+/* ------------------------------------------------------ */
+/*                  RESPONSIVE - MOBILE (3 cartes)        */
+/* ------------------------------------------------------ */
+
+@media (max-width: 768px) {
     .carousel-title {
         font-size: 2rem;
         text-align: center;
         margin-left: 0;
+    }
+
+    .carousel-3d-wrapper {
+        height: 22rem;
     }
 
     .carousel-frame::before,
@@ -242,6 +249,10 @@
     .corner-bottom::after {
         width: 120px;
         height: 120px;
+    }
+
+    .carousel-arrow {
+        font-size: 2.5rem;
     }
 
     .carousel-arrow.left {
@@ -253,17 +264,36 @@
     }
 }
 
-@media (max-width: 480px) {
-    .carousel-card {
-        width: 7.5rem;
-        height: 12rem;
-    }
+/* ------------------------------------------------------ */
+/*                  RESPONSIVE - PETIT MOBILE             */
+/* ------------------------------------------------------ */
 
+@media (max-width: 480px) {
     .carousel-title {
         font-size: 1.7rem;
     }
 
     .carousel-3d-wrapper {
-        height: 20rem;
+        height: 18rem;
+    }
+
+    .carousel-arrow {
+        font-size: 2rem;
+    }
+
+    .carousel-arrow.left {
+        left: 0.5rem;
+    }
+
+    .carousel-arrow.right {
+        right: 0.5rem;
+    }
+
+    .carousel-overlay-title {
+        font-size: 1rem;
+    }
+
+    .carousel-overlay-year {
+        font-size: 0.75rem;
     }
 }
