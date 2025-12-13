@@ -316,7 +316,7 @@ function SearchBar({
       <input
         type="text"
         className="search-input"
-        placeholder={placeholder ?? "Search by movie, series or actor"}
+        placeholder={placeholder ?? "Search by movie or actor"}
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
       />
