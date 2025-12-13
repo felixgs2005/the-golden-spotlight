@@ -397,12 +397,17 @@
 
 @media (max-width: 992px) {
 
-  /* Layout */
+  /* Layout: stack + true centering */
   .actor-top,
   .actor-bottom {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    margin-top: 2rem;
+
+    width: 100%;
+    max-width: 720px;
+    margin: 2rem auto 0;
     gap: 2rem;
   }
 
@@ -415,6 +420,9 @@
   /* Title */
   .actor-title-block {
     padding-left: 0;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
   }
 
   .actor-deco {
@@ -423,25 +431,28 @@
 
   .actor-name {
     font-size: 2.8rem;
-    margin-top: 1rem;
+    margin: 0 auto 1rem;
     text-align: center;
   }
 
   /* Biography */
   .actor-biography {
-    max-width: 100%;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
     text-align: left;
-    margin-left: 0;
   }
 
   .read-more-button {
-    margin-left: 0;
+    margin: 1rem auto 0;
+    display: block;
   }
 
   /* Personal Info */
   .personal-info {
     margin: 2rem auto 0;
-    max-width: 100%;
+    max-width: 360px;
+    justify-self: auto;
   }
 
   .personal-info::before,
@@ -452,25 +463,28 @@
     height: 150px;
   }
 
-  /* Filmography */
   .filmography-section {
-    margin-top: 2rem;
-  }
-
-  .section-title {
-    text-align: center;
+    margin-top: 3rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .carousel-container {
-    height: 22rem;
+    height: 25rem;
+    width: 100%;
   }
 
   .carousel-content {
-    left: 5%;
+    width: 100%;
+    left: 0;
   }
 
   .carousel-arrow {
     font-size: 2rem;
+  }
+
+  .section-title {
+    text-align: center;
   }
 
   .similar-actor-card {
@@ -483,26 +497,24 @@
 
 @media (max-width: 768px) {
 
-  /* Layout */
   .actor-top,
   .actor-bottom {
+    max-width: 92%;
     gap: 1.5rem;
   }
 
-  /* Title */
   .actor-name {
     font-size: 2.3rem;
   }
 
-  /* Biography */
   .actor-biography {
     font-size: 0.95rem;
     line-height: 1.7;
   }
 
-  /* Personal Info */
   .personal-info {
     padding: 0.5rem;
+    max-width: 360px;
   }
 
   .personal-info::before,
@@ -525,14 +537,15 @@
     font-size: 14px;
   }
 
-  /* Carousel */
+  /* Filmography */
   .carousel-container {
     height: 20rem;
+    width: 100%;
   }
 
   .carousel-content {
-    left: 10%;
     width: 100%;
+    left: 20%;
   }
 
   .carousel-arrow {
@@ -540,15 +553,6 @@
     padding: 0.5rem;
   }
 
-  .carousel-arrow-left {
-    left: 0;
-  }
-
-  .carousel-arrow-right {
-    right: 0;
-  }
-
-  /* Similar Actors */
   .similar-actor-card {
     width: 150px;
     min-height: 200px;
@@ -563,17 +567,14 @@
 
 @media (max-width: 480px) {
 
-  /* Title */
   .actor-name {
     font-size: 1.8rem;
   }
 
-  /* Biography */
   .actor-biography {
     font-size: 0.9rem;
   }
 
-  /* Personal Info */
   .personal-info::before,
   .personal-info::after,
   .personal-info .corner-bl,
@@ -586,17 +587,21 @@
     font-size: 24px;
   }
 
-  /* Carousel */
   .carousel-container {
     height: 18rem;
   }
+
+  .carousel-content {
+    width: 100%;
+    left: 0;
+  }
+
 
   .carousel-arrow {
     font-size: 1.5rem;
     padding: 0.3rem;
   }
 
-  /* Similar Actors */
   .similar-actor-card {
     width: 130px;
     min-height: 180px;
@@ -604,8 +609,8 @@
 }
 
 @media (max-width: 360px) {
-    .similar-actor-card {
-        width: 110px;
-        min-height: 160px;
-    }
+  .similar-actor-card {
+    width: 110px;
+    min-height: 160px;
+  }
 }
