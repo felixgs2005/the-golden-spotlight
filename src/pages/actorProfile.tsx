@@ -12,6 +12,28 @@ import {
   type SimilarActor,
 } from "../api/tmdb";
 
+// ==================== HOOK RESPONSIVE ====================
+
+function useCarouselSize() {
+  const [visibleCards, setVisibleCards] = useState(5);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth <= 768) {
+        setVisibleCards(3); // Mobile: 3 cartes
+      } else {
+        setVisibleCards(5); // Desktop/Tablette: 5 cartes
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  return visibleCards;
+}
+
 type State =
   | { status: "idle" }
   | { status: "loading" }
@@ -289,6 +311,7 @@ function FilmographySection({
   onPrev: () => void;
   onNext: () => void;
 }) {
+  const visibleCards = useCarouselSize();
   const [positions, setPositions] = useState<number[]>([]);
 
   useEffect(() => {
@@ -297,17 +320,26 @@ function FilmographySection({
     const newPositions = movies.map((_, i) => {
       const diff = (i - carouselPosition + movies.length) % movies.length;
 
-      if (diff === 0) return 1;
-      if (diff === 1) return 2;
-      if (diff === 2) return 3;
-      if (diff === 3) return 4;
-      if (diff === 4) return 5;
+      // Pour 5 cartes (Desktop/Tablette)
+      if (visibleCards === 5) {
+        if (diff === 0) return 1;
+        if (diff === 1) return 2;
+        if (diff === 2) return 3;
+        if (diff === 3) return 4;
+        if (diff === 4) return 5;
+      }
+      // Pour 3 cartes (Mobile)
+      else if (visibleCards === 3) {
+        if (diff === 0) return 1;
+        if (diff === 1) return 2;
+        if (diff === 2) return 3;
+      }
 
       return 0;
     });
 
     setPositions(newPositions);
-  }, [movies, carouselPosition]);
+  }, [movies, carouselPosition, visibleCards]);
 
   if (movies.length === 0) return null;
 
@@ -322,7 +354,12 @@ function FilmographySection({
 
         <div className="carousel-content">
           {movies.map((movie, index) => (
-            <FilmCard key={movie.id} movie={movie} position={positions[index]} />
+            <FilmCard
+              key={movie.id}
+              movie={movie}
+              position={positions[index]}
+              totalVisible={visibleCards}
+            />
           ))}
         </div>
 
@@ -334,13 +371,19 @@ function FilmographySection({
   );
 }
 
-function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
+function FilmCard({
+  movie,
+  position,
+  totalVisible,
+}: {
+  movie: MovieCard;
+  position: number;
+  totalVisible: number;
+}) {
   const getPositionStyles = () => {
     const baseStyle: React.CSSProperties = {
       position: "absolute",
       left: "0%",
-      height: "24rem",
-      width: "14rem",
       borderRadius: "8px",
       zIndex: 0,
       opacity: 0,
@@ -349,50 +392,100 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
       overflow: "hidden",
     };
 
-    switch (position) {
-      case 1:
-        return {
-          ...baseStyle,
-          transform: "translateX(0px) scale(0.9)",
-          opacity: 1,
-          zIndex: 5,
-        };
+    // Configuration pour 5 cartes (Desktop/Tablette)
+    if (totalVisible === 5) {
+      const height = "24rem";
+      const width = "14rem";
 
-      case 2:
-        return {
-          ...baseStyle,
-          transform: "translateX(150px) scale(0.78)",
-          opacity: 1,
-          zIndex: 4,
-        };
-
-      case 3:
-        return {
-          ...baseStyle,
-          transform: "translateX(280px) scale(0.68)",
-          opacity: 1,
-          zIndex: 3,
-        };
-
-      case 4:
-        return {
-          ...baseStyle,
-          transform: "translateX(390px) scale(0.58)",
-          opacity: 1,
-          zIndex: 2,
-        };
-
-      case 5:
-        return {
-          ...baseStyle,
-          transform: "translateX(480px) scale(0.48)",
-          opacity: 1,
-          zIndex: 1,
-        };
-
-      default:
-        return baseStyle;
+      switch (position) {
+        case 1:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(0px) scale(0.9)",
+            opacity: 1,
+            zIndex: 5,
+          };
+        case 2:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(150px) scale(0.78)",
+            opacity: 1,
+            zIndex: 4,
+          };
+        case 3:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(280px) scale(0.68)",
+            opacity: 1,
+            zIndex: 3,
+          };
+        case 4:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(390px) scale(0.58)",
+            opacity: 1,
+            zIndex: 2,
+          };
+        case 5:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(480px) scale(0.48)",
+            opacity: 1,
+            zIndex: 1,
+          };
+        default:
+          return { ...baseStyle, height, width };
+      }
     }
+    // Configuration pour 3 cartes (Mobile)
+    else if (totalVisible === 3) {
+      const height = "19rem";
+      const width = "11rem";
+
+      switch (position) {
+        case 1:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(0px) scale(0.9)",
+            opacity: 1,
+            zIndex: 5,
+          };
+        case 2:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(120px) scale(0.78)",
+            opacity: 1,
+            zIndex: 4,
+          };
+        case 3:
+          return {
+            ...baseStyle,
+            height,
+            width,
+            transform: "translateX(225px) scale(0.68)",
+            opacity: 1,
+            zIndex: 3,
+          };
+        default:
+          return { ...baseStyle, height, width };
+      }
+    }
+
+    return baseStyle;
   };
 
   return (
