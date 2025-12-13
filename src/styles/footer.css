@@ -172,6 +172,12 @@
   margin: 0;
 }
 
+@media (max-width: 950px) {
+  .footer-socials {
+    gap: 40px;
+  }
+}
+
 /* MOBILE */
 @media (max-width: 768px) {
   .footer {
