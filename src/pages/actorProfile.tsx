@@ -261,7 +261,6 @@ function PersonalInformation({
       <div className="personal-info-section content-score-section">
         <InfoItem label="Content Score">
           <div className="content-score">
-            <StarRating percentage={popularityScore} />
             <span className="score-value">{popularityScore}%</span>
           </div>
         </InfoItem>
@@ -275,17 +274,6 @@ function InfoItem({ label, children }: { label: string; children: React.ReactNod
     <div className="info-item">
       <div className="info-label">{label}</div>
       <div className="info-value">{children}</div>
-    </div>
-  );
-}
-
-function StarRating({ percentage }: { percentage: number }) {
-  return (
-    <div className="star-rating">
-      <div className="star-background">★</div>
-      <div className="star-fill" style={{ width: `${percentage}%` }}>
-        ★
-      </div>
     </div>
   );
 }
@@ -342,10 +330,6 @@ function FilmographySection({
           <i className="fa fa-angle-right"></i>
         </button>
       </div>
-
-      <div className="filmography-link">
-        <Link to="#">See filmography</Link>
-      </div>
     </section>
   );
 }
@@ -378,7 +362,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
         return {
           ...baseStyle,
           transform: "translateX(150px) scale(0.78)",
-          opacity: 0.9,
+          opacity: 1,
           zIndex: 4,
         };
 
@@ -386,7 +370,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
         return {
           ...baseStyle,
           transform: "translateX(280px) scale(0.68)",
-          opacity: 0.8,
+          opacity: 1,
           zIndex: 3,
         };
 
@@ -394,7 +378,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
         return {
           ...baseStyle,
           transform: "translateX(390px) scale(0.58)",
-          opacity: 0.7,
+          opacity: 1,
           zIndex: 2,
         };
 
@@ -402,7 +386,7 @@ function FilmCard({ movie, position }: { movie: MovieCard; position: number }) {
         return {
           ...baseStyle,
           transform: "translateX(480px) scale(0.48)",
-          opacity: 0.6,
+          opacity: 1,
           zIndex: 1,
         };
 
