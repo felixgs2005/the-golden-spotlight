@@ -34,6 +34,7 @@
 
 .play-button {
   position: absolute;
+  line-height: 1.2;
   bottom: 25px;
   left: 90%;
   transform: translateX(-50%);
@@ -50,7 +51,12 @@
   text-transform: uppercase;
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-size: 20px;
-  clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 10% 100%, 0% 50%);
+  clip-path: polygon(10% 0%,
+      100% 0%,
+      100% 90%,
+      90% 100%,
+      0% 100%,
+      0% 10%);
   position: absolute;
   overflow: hidden;
   transition: background-color 0.3s, color 0.3s;
@@ -88,17 +94,40 @@
 
 @media (max-width: 768px) {
   .play-button {
-    left: 50%;
-    bottom: 15px;
+    isolation: isolate;
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+
+    width: 100%;
+    max-width: 100%;
+    margin-top: 12px;
+
+    height: auto;
+    line-height: 1.2;
+
+    clip-path: none !important;
+    border-radius: 0;
+
     font-size: 16px;
-    padding: 4px 20px;
+    padding: 10px 0;
+  }
+
+  .play-button::after {
+    display: none;
+  }
+
+  .play-button:hover {
+    background-color: #FFF0C4;
+    color: #8C1007;
   }
 }
 
 @media (max-width: 480px) {
   .play-button {
     font-size: 14px;
-    padding: 4px 16px;
+    padding: 8px 0;
     gap: 10px;
   }
 }
