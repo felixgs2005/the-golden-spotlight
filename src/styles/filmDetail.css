@@ -49,35 +49,66 @@
 }
 
 /* ============================= */
-/*         PLAY BUTTON           */
+/*        TRAILER BUTTON         */
 /* ============================= */
 
-.play-button {
+.trailer-button {
     position: absolute;
     bottom: 55px;
     left: 70%;
     transform: translateX(-50%);
     padding: 6px 30px;
+
     background-color: #FFF0C4;
     color: #8C1007;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.3s;
+
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 20px;
+
     text-transform: uppercase;
     font-family: 'Montserrat', Arial, Helvetica, sans-serif;
     font-size: 20px;
+
     z-index: 10;
+    overflow: hidden;
+
     clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 10% 100%, 0% 50%);
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.play-button:hover {
+/* SHIMMER EFFECT */
+.trailer-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 240, 196, 0.55),
+            transparent);
+
+    transform: skewX(-20deg);
+    transition: left 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.trailer-button:hover {
     background-color: #8C1007;
     color: #FFF0C4;
 }
+
+.trailer-button:hover::after {
+    left: 130%;
+}
+
 
 /* ============================= */
 /*       ACTORS SCROLL LIST      */

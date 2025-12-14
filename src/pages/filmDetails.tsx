@@ -238,7 +238,7 @@ function TrailerButton({ trailerUrl, onPlay }: { trailerUrl?: string; onPlay: ()
   }
 
   return (
-    <button onClick={onPlay} className="play-button mt-auto">
+    <button onClick={onPlay} className="trailer-button mt-auto">
       ▶ Trailer
     </button>
   );
