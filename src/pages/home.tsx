@@ -303,12 +303,15 @@ export default function Home() {
       {/* HERO */}
       <div className="home-container">
         <div className="section-hero">
-          <img className="img-hero" src={heroImageUrl} alt={heroMovie?.title || ""} />
-          {heroMovie && (
-            <Link to={`/film/${heroMovie.id}`} className="play-button">
-              <i className="fa fa-play"></i> Play
-            </Link>
-          )}
+          <div className="hero-inner">
+            <img className="img-hero" src={heroImageUrl} alt={heroMovie?.title || ""} />
+
+            {heroMovie && (
+              <Link to={`/film/${heroMovie.id}`} className="play-button">
+                <i className="fa fa-play"></i> Play
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
