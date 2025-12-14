@@ -258,18 +258,63 @@
 /* FILM CARD */
 
 .film-card {
-  text-decoration: none;
-  display: block;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   position: absolute;
-  transition: all 0.5s ease-in-out;
+  display: block;
+  text-decoration: none;
+
+  transform-style: preserve-3d;
+  border: 4px solid #FFF0C4;
+  overflow: hidden;
+
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 12px 25px rgba(0, 0, 0, 0.45),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.45s ease,
+    border-color 0.2s ease;
 }
 
 .film-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 4px solid #FFF0C4;
+}
+
+.film-card:hover {
+  transform: scale(1.04);
+  border-color: #8C1007;
+}
+
+.film-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1rem;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  pointer-events: none;
+}
+
+.film-card:hover .film-card-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  opacity: 1;
+}
+
+.film-overlay-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FFF0C4;
+}
+
+.film-overlay-year {
+  font-size: 0.85rem;
+  color: #f0d7b7;
 }
 
 .film-card-placeholder {
@@ -281,18 +326,6 @@
   align-items: center;
   justify-content: center;
   color: #666;
-}
-
-.filmography-link a {
-  color: #FFF0C4;
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-family: "montserrat", sans-serif;
-}
-
-.filmography-link a:hover {
-  color: #f5d7b7;
-  text-decoration: underline;
 }
 
 /* ==================== SEE ALSO SECTION ==================== */

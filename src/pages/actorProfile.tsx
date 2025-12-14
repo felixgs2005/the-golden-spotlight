@@ -320,16 +320,13 @@ function FilmographySection({
     const newPositions = movies.map((_, i) => {
       const diff = (i - carouselPosition + movies.length) % movies.length;
 
-      // Pour 5 cartes (Desktop/Tablette)
       if (visibleCards === 5) {
         if (diff === 0) return 1;
         if (diff === 1) return 2;
         if (diff === 2) return 3;
         if (diff === 3) return 4;
         if (diff === 4) return 5;
-      }
-      // Pour 3 cartes (Mobile)
-      else if (visibleCards === 3) {
+      } else if (visibleCards === 3) {
         if (diff === 0) return 1;
         if (diff === 1) return 2;
         if (diff === 2) return 3;
@@ -384,7 +381,6 @@ function FilmCard({
     const baseStyle: React.CSSProperties = {
       position: "absolute",
       left: "0%",
-      borderRadius: "8px",
       zIndex: 0,
       opacity: 0,
       transform: "scale(1)",
@@ -392,7 +388,6 @@ function FilmCard({
       overflow: "hidden",
     };
 
-    // Configuration pour 5 cartes (Desktop/Tablette)
     if (totalVisible === 5) {
       const height = "24rem";
       const width = "14rem";
@@ -446,9 +441,7 @@ function FilmCard({
         default:
           return { ...baseStyle, height, width };
       }
-    }
-    // Configuration pour 3 cartes (Mobile)
-    else if (totalVisible === 3) {
+    } else if (totalVisible === 3) {
       const height = "19rem";
       const width = "11rem";
 
@@ -491,15 +484,16 @@ function FilmCard({
   return (
     <Link to={`/film/${movie.id}`} className="film-card" style={getPositionStyles()}>
       {movie.posterUrl ? (
-        <img
-          src={movie.posterUrl}
-          alt={movie.title}
-          className="film-card-img"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+        <img src={movie.posterUrl} alt={movie.title} className="film-card-img" />
       ) : (
         <div className="film-card-placeholder">No poster</div>
       )}
+
+      {/* HOVER OVERLAY (same logic as 3D carousel) */}
+      <div className="film-card-overlay">
+        <div className="film-overlay-title">{movie.title}</div>
+        {movie.year && <div className="film-overlay-year">{movie.year}</div>}
+      </div>
     </Link>
   );
 }
