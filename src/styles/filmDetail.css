@@ -123,7 +123,6 @@
     scroll-behavior: smooth;
 }
 
-/* Scrollbar — same as actor page */
 .actors-scroll-container::-webkit-scrollbar {
     height: 18px;
 }
@@ -216,15 +215,51 @@
 /*      RESPONSIVE BREAKPOINTS   */
 /* ============================= */
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
     .film-hero {
         min-height: 35vh;
     }
 
     .trailer-button {
         bottom: 45px;
-        left: 65%;
-        font-size: 18px;
+        left: 88%;
+        font-size: 14px;
+        padding: 5px 25px;
+    }
+
+    .actor-card {
+        width: 180px;
+        min-height: 230px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .film-hero {
+        min-height: 35vh;
+    }
+
+    .trailer-button {
+        bottom: 20px;
+        left: 85%;
+        font-size: 14px;
+        padding: 5px 25px;
+    }
+
+    .actor-card {
+        width: 180px;
+        min-height: 230px;
+    }
+}
+
+@media (max-width: 992px) {
+    .film-hero {
+        min-height: 35vh;
+    }
+
+    .trailer-button {
+        bottom: 20px;
+        left: 82%;
+        font-size: 14px;
         padding: 5px 25px;
     }
 
