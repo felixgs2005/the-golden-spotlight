@@ -55,7 +55,7 @@
 .trailer-button {
     position: absolute;
     bottom: 55px;
-    left: 70%;
+    left: 87%;
     transform: translateX(-50%);
     padding: 6px 30px;
 
@@ -113,8 +113,6 @@
 /* ============================= */
 /*       ACTORS SCROLL LIST      */
 /* ============================= */
-
-/* ==================== ACTORS SECTION — MATCH ACTOR PAGE LOOK ==================== */
 
 .actors-scroll-container {
     display: flex;
@@ -223,7 +221,7 @@
         min-height: 35vh;
     }
 
-    .play-button {
+    .trailer-button {
         bottom: 45px;
         left: 65%;
         font-size: 18px;
@@ -252,7 +250,7 @@
         margin: 0 auto 2rem !important;
     }
 
-    .play-button {
+    .trailer-button {
         position: static;
         transform: none;
         margin: 2rem auto 0;
@@ -284,7 +282,7 @@
         min-height: 180px;
     }
 
-    .play-button {
+    .trailer-button {
         font-size: 14px;
         padding: 6px 20px;
     }
@@ -300,7 +298,7 @@
         min-height: 160px;
     }
 
-    .play-button {
+    .trailer-button {
         font-size: 12px;
         padding: 5px 18px;
     }
